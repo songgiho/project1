@@ -220,146 +220,132 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
 
   const daysLeft = calculateDaysLeft(challenge.endDate);
 
+  // 참여자 셀 현황판용 (번호 부여)
+  const allParticipants = challenge.participants.map((p, idx) => ({ ...p, number: idx + 1 }));
+  const total = challenge.participants.length;
+  const survived = survivedParticipants.length;
+  const eliminated = eliminatedParticipants.length;
+  const progress = total > 0 ? Math.round((survived / total) * 100) : 0;
+
+  // 전체 기간 대비 진행률 계산
+  const totalDays = Math.max(1, Math.ceil((new Date(challenge.endDate).getTime() - new Date(challenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1);
+  const daysPassed = Math.max(0, Math.min(totalDays, Math.ceil((new Date().getTime() - new Date(challenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1));
+  const periodProgress = Math.round((daysPassed / totalDays) * 100);
+
   return (
-    <div className="space-y-6">
-      {/* 챌린지 정보 헤더 */}
-      <div className="card p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-nanum mb-2">{challenge.name}</h1>
-            <p className="text-muted-foreground">{challenge.description}</p>
-          </div>
-          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-            challenge.isActive 
-              ? 'bg-green-100 text-green-700' 
-              : 'bg-gray-100 text-gray-700'
-          }`}>
-            {challenge.isActive ? '진행 중' : '종료'}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            <div>
-              <div className="text-sm text-muted-foreground">기간</div>
-              <div className="font-medium">
-                {format(new Date(challenge.startDate), 'M월 d일')} - {format(new Date(challenge.endDate), 'M월 d일')}
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Target className="w-5 h-5 text-primary" />
-            <div>
-              <div className="text-sm text-muted-foreground">목표</div>
-              <div className="font-medium">
-                {challenge.targetValue}
-                {challenge.targetType === 'calorie' && 'kcal'}
-                {challenge.targetType === 'macro' && 'g'}
-                {challenge.targetType === 'weight' && 'kg'}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Users className="w-5 h-5 text-primary" />
-            <div>
-              <div className="text-sm text-muted-foreground">참여자</div>
-              <div className="font-medium">{challenge.participants.length}명</div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-primary" />
-            <div>
-              <div className="text-sm text-muted-foreground">
-                {challenge.isActive ? '남은 기간' : '완료'}
-              </div>
-              <div className="font-medium">
-                {challenge.isActive ? (daysLeft > 0 ? `${daysLeft}일` : '종료') : '완료'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 생존/탈락 통계 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4">
-          <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      {/* 챌린지 정보 + 전체 기간 대비 진행률 (상단) */}
+      <div className="flex flex-col md:flex-row gap-8 items-center justify-center card p-8">
+        <div className="flex-1 min-w-[240px]">
+          <h2 className="text-2xl font-nanum mb-2">챌린지 정보</h2>
+          <p className="text-muted-foreground mb-4 text-base font-nanum">{challenge.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center space-x-2">
-              <Heart className="w-5 h-5 text-green-500" />
-              <span className="font-medium">생존자</span>
+              <Calendar className="w-5 h-5 text-primary" />
+              <div>
+                <div className="text-base text-muted-foreground font-nanum">기간</div>
+                <div className="font-medium font-nanum">
+                  {format(new Date(challenge.startDate), 'M월 d일')} - {format(new Date(challenge.endDate), 'M월 d일')}
+                </div>
+              </div>
             </div>
-            <span className="text-2xl font-nanum text-green-500">
-              {survivedParticipants.length}
-            </span>
-          </div>
-        </div>
-        
-        <div className="card p-4">
-          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Skull className="w-5 h-5 text-red-500" />
-              <span className="font-medium">탈락자</span>
+              <Target className="w-5 h-5 text-primary" />
+              <div>
+                <div className="text-base text-muted-foreground font-nanum">목표</div>
+                <div className="font-medium font-nanum">
+                  {challenge.targetValue}
+                  {challenge.targetType === 'calorie' && 'kcal'}
+                  {challenge.targetType === 'macro' && 'g'}
+                  {challenge.targetType === 'weight' && 'kg'}
+                </div>
+              </div>
             </div>
-            <span className="text-2xl font-nanum text-red-500">
-              {eliminatedParticipants.length}
-            </span>
+            <div className="flex items-center space-x-2">
+              <Users className="w-5 h-5 text-primary" />
+              <div>
+                <div className="text-base text-muted-foreground font-nanum">참여자</div>
+                <div className="font-medium font-nanum">{challenge.participants.length}명</div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Trophy className="w-5 h-5 text-primary" />
+              <div>
+                <div className="text-base text-muted-foreground font-nanum">
+                  {challenge.isActive ? '남은 기간' : '완료'}
+                </div>
+                <div className="font-medium font-nanum">
+                  {challenge.isActive ? (daysLeft > 0 ? `${daysLeft}일` : '종료') : '완료'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* 전체 기간 대비 진행률 원형 그래프 (확대) */}
+        <div className="flex flex-col items-center justify-center min-w-[160px]">
+          <span className="text-lg text-primary font-nanum mb-2">기간 진행률</span>
+          <div className="relative w-32 h-32">
+            <svg className="w-32 h-32 rotate-[-90deg]" viewBox="0 0 128 128">
+              <circle cx="64" cy="64" r="52" fill="none" stroke="#eee" strokeWidth="12" />
+              <circle
+                cx="64" cy="64" r="52" fill="none"
+                stroke="#38bdf8" strokeWidth="12"
+                strokeDasharray={2 * Math.PI * 52}
+                strokeDashoffset={2 * Math.PI * 52 * (1 - periodProgress / 100)}
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="absolute inset-0 flex flex-col items-center justify-center text-3xl font-nanum text-sky-400">{periodProgress}%</span>
+            <span className="absolute bottom-4 left-0 right-0 text-base text-muted-foreground text-center font-nanum">{daysPassed} / {totalDays}일</span>
           </div>
         </div>
       </div>
 
-      {/* 탭 메뉴 */}
-      <div className="flex space-x-4 border-b border-border">
-        <button
-          onClick={() => setActiveTab('survived')}
-          className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'survived'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          생존자 ({survivedParticipants.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('eliminated')}
-          className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'eliminated'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          탈락자 ({eliminatedParticipants.length})
-        </button>
-      </div>
-
-      {/* 참여자 목록 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {activeTab === 'survived' ? (
-          sortedSurvived.length > 0 ? (
-            sortedSurvived.map((participant) => (
-              <ParticipantCard key={participant.id} participant={participant} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-8">
-              <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">생존자가 없습니다</p>
-            </div>
-          )
-        ) : (
-          eliminatedParticipants.length > 0 ? (
-            eliminatedParticipants.map((participant) => (
-              <ParticipantCard key={participant.id} participant={participant} isEliminated />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-8">
-              <Skull className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">탈락자가 없습니다</p>
-            </div>
-          )
-        )}
+      {/* 참여자 현황판 + 생존율 (하단) */}
+      <div className="flex flex-col md:flex-row gap-8 items-center justify-center card p-8">
+        {/* 서바이벌 보드판 */}
+        <div className="flex-1 min-w-[320px]">
+          <h2 className="text-2xl font-nanum mb-2">참여자 현황</h2>
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 p-2 rounded-xl bg-muted/40">
+            {allParticipants.map((p) => (
+              <div
+                key={p.id}
+                className={`flex flex-col items-center justify-center rounded-lg border p-1 h-20 transition-all
+                  ${p.status === 'survived' ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-200 border-gray-300 opacity-40'}
+                `}
+                title={p.user.nickname}
+              >
+                <div className="w-10 h-10 rounded-full overflow-hidden mb-1 border border-white">
+                  {p.user.profilePicture ? (
+                    <img src={p.user.profilePicture} alt={p.user.nickname} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-lg font-nanum">{p.user.nickname.charAt(0)}</span>
+                  )}
+                </div>
+                <span className="text-base font-nanum">{p.number}</span>
+                <span className="text-xs font-nanum truncate max-w-[56px]">{p.user.nickname}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* 생존율 원형 그래프 (확대) */}
+        <div className="flex flex-col items-center justify-center min-w-[160px]">
+          <span className="text-lg text-primary font-nanum mb-2">생존율</span>
+          <div className="relative w-32 h-32">
+            <svg className="w-32 h-32 rotate-[-90deg]" viewBox="0 0 128 128">
+              <circle cx="64" cy="64" r="52" fill="none" stroke="#eee" strokeWidth="12" />
+              <circle
+                cx="64" cy="64" r="52" fill="none"
+                stroke="#fbbf24" strokeWidth="12"
+                strokeDasharray={2 * Math.PI * 52}
+                strokeDashoffset={2 * Math.PI * 52 * (1 - progress / 100)}
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="absolute inset-0 flex flex-col items-center justify-center text-3xl font-nanum text-primary">{progress}%</span>
+            <span className="absolute bottom-4 left-0 right-0 text-base text-muted-foreground text-center font-nanum">{survived} / {total}명</span>
+          </div>
+        </div>
       </div>
     </div>
   );
