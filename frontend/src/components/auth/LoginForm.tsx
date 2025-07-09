@@ -68,11 +68,11 @@ export function LoginForm() {
             })}
             type="email"
             placeholder="Email"
-            className="w-full pl-10 pr-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white font-nunito text-base shadow-sm"
           />
         </div>
         {errors.email && (
-          <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+          <p className="text-sm text-destructive mt-1 font-nunito">{errors.email.message}</p>
         )}
       </div>
 
@@ -90,7 +90,7 @@ export function LoginForm() {
             })}
             type={showPassword ? 'text' : 'password'}
             placeholder="Password"
-            className="w-full pl-10 pr-12 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full pl-10 pr-12 py-3 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white font-nunito text-base shadow-sm"
           />
           <button
             type="button"
@@ -101,13 +101,13 @@ export function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="text-sm text-destructive mt-1">{errors.password.message}</p>
+          <p className="text-sm text-destructive mt-1 font-nunito">{errors.password.message}</p>
         )}
       </div>
 
       {/* 에러 메시지 */}
       {error && (
-        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-xl p-3 font-nunito">
           {error}
         </div>
       )}
@@ -116,7 +116,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-foreground text-background font-medium py-3 px-4 rounded-lg hover:bg-foreground/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full btn-primary rounded-full py-3 px-4 text-base font-bold shadow-md font-nunito"
       >
         {isLoading ? '로그인 중...' : 'Log In'}
       </button>

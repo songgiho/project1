@@ -5,7 +5,7 @@ import { Brain, AlertTriangle, Lightbulb, Heart, X } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { AICoachTip as AICoachTipType } from '@/types';
 
-export function AICoachTip() {
+export function AICoachTip({ onClose }: { onClose?: () => void }) {
   const [tip, setTip] = useState<AICoachTipType | null>(null);
   const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -105,7 +105,7 @@ export function AICoachTip() {
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center space-x-2">
-              <h3 className="font-semibold text-sm">AI 코치 팁</h3>
+              <h3 className="font-semibold text-sm font-nanum">AI 코치 팁</h3>
               {tip.priority === 'high' && (
                 <span className="px-2 py-1 text-xs rounded-full bg-destructive/20 text-destructive">
                   {getPriorityLabel(tip.priority)}
@@ -113,7 +113,7 @@ export function AICoachTip() {
               )}
             </div>
             <button
-              onClick={() => setDismissed(true)}
+              onClick={onClose}
               className="p-1 rounded-md hover:bg-muted/50 transition-colors"
             >
               <X className="w-4 h-4 text-muted-foreground" />

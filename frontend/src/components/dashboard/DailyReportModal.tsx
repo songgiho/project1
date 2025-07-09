@@ -126,16 +126,16 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-fade-in">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-white/95 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-fade-in border border-border">
         {/* 모달 헤더 */}
         <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-nanum text-foreground">
             {formatDate(date)} 식사 기록
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
+            className="p-2 rounded-full hover:bg-muted transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -160,10 +160,10 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
 
               {/* 식사 목록 */}
               <div className="lg:col-span-2">
-                <h3 className="text-lg font-semibold mb-4">식사 목록</h3>
+                <h3 className="text-lg font-nanum mb-4 font-nanum">식사 목록</h3>
                 <div className="space-y-4">
                   {dailyData.meals.map((meal) => (
-                    <div key={meal.id} className="card p-4">
+                    <div key={meal.id} className="bg-white rounded-2xl border border-border shadow p-4">
                       <div className="flex items-start space-x-4">
                         {/* 식사 사진 */}
                         <div className="relative w-20 h-20 rounded-lg bg-muted flex items-center justify-center">
@@ -192,9 +192,9 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
                             </div>
                           </div>
                           
-                          <h4 className="font-medium text-lg mt-1">{meal.foodName}</h4>
+                          <h4 className="font-nanum text-lg mt-1 font-nanum">{meal.foodName}</h4>
                           
-                          <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground font-nanum">
                             <span>{meal.calories}kcal</span>
                             <span>탄수화물 {meal.carbs}g</span>
                             <span>단백질 {meal.protein}g</span>

@@ -5,20 +5,11 @@ import { HelperLinks } from '@/components/auth/HelperLinks';
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-8 card-cute">
         {/* 페이지 헤더 */}
-        <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6">
-            <svg className="w-8 h-8 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Diet Survival
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Log In or Sign Up to Get Started
-          </p>
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-nanum text-foreground mb-1">체감</h1>
+          <p className="text-lg text-muted-foreground font-nanum">Log In or Sign Up to Get Started</p>
         </div>
 
         {/* 카카오 로그인 버튼 */}
@@ -30,9 +21,7 @@ export default function LoginPage() {
             <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-background text-muted-foreground">
-              or
-            </span>
+            <span className="px-2 bg-background text-muted-foreground font-nanum">or</span>
           </div>
         </div>
 

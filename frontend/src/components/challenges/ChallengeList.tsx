@@ -108,8 +108,8 @@ export function ChallengeList() {
               <TargetIcon className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">{challenge.name}</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-lg font-nanum font-nanum">{challenge.name}</h3>
+              <p className="text-sm text-muted-foreground font-nanum">
                 {getTargetTypeLabel(challenge.targetType)} 목표
               </p>
             </div>
@@ -123,7 +123,7 @@ export function ChallengeList() {
           </div>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="text-sm text-muted-foreground mb-4 font-nanum">
           {challenge.description}
         </p>
 
@@ -149,9 +149,9 @@ export function ChallengeList() {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="text-sm">
+          <div className="text-sm font-nanum">
             <span className="text-muted-foreground">목표: </span>
-            <span className="font-medium">
+            <span className="font-medium font-nanum">
               {challenge.targetValue}
               {challenge.targetType === 'calorie' && 'kcal'}
               {challenge.targetType === 'macro' && 'g'}
@@ -160,9 +160,9 @@ export function ChallengeList() {
           </div>
           
           {challenge.isActive && (
-            <div className="text-sm">
+            <div className="text-sm font-nanum">
               <span className="text-muted-foreground">남은 기간: </span>
-              <span className="font-medium text-primary">
+              <span className="font-medium text-primary font-nanum">
                 {daysLeft > 0 ? `${daysLeft}일` : '종료'}
               </span>
             </div>

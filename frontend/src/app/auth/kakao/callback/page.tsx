@@ -96,7 +96,7 @@ export default function KakaoCallbackPage() {
 
         {/* 메시지 */}
         <div>
-          <h2 className="text-xl font-semibold text-foreground mb-2">
+          <h2 className="text-xl font-nanum text-foreground mb-2">
             {status === 'loading' && '로그인 처리 중'}
             {status === 'success' && '로그인 성공'}
             {status === 'error' && '로그인 실패'}

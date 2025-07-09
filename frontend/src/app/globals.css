@@ -1,63 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Baloo+2:wght@400;700&family=Montserrat:wght@400;700&display=swap');
+
+@font-face {
+  font-family: 'NanumCute';
+  src: url('/fonts/나눔손글씨 예쁜 민경체.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --card: #ffffff;
-  --card-foreground: #171717;
-  --popover: #ffffff;
-  --popover-foreground: #171717;
-  --primary: #16a34a;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
+  --background: #fffdf7;
+  --foreground: #22223b;
+  --card: #fffaf3;
+  --card-foreground: #22223b;
+  --popover: #fffaf3;
+  --popover-foreground: #22223b;
+  --primary: #ffb703;
+  --primary-foreground: #fff;
+  --secondary: #8ecae6;
+  --secondary-foreground: #22223b;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
+  --accent: #ffd6a5;
+  --accent-foreground: #22223b;
+  --destructive: #ef476f;
+  --destructive-foreground: #fff;
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #16a34a;
-  --radius: 0.5rem;
-  
-  /* 앱 전용 색상 */
+  --ring: #ffb703;
+  --radius: 1.2rem;
+
+  /* 앱 전용 색상 (파스텔 계열, 귀여운 느낌) */
+  --pastel-pink: #ffd6e0;
+  --pastel-yellow: #fff5ba;
+  --pastel-green: #b7efc5;
+  --pastel-blue: #a0c4ff;
+  --pastel-purple: #bdb2ff;
   --challenge-active: #e0f7fa;
   --nutri-score-a: #00c851;
   --nutri-score-b: #ffbb33;
   --nutri-score-c: #ff8800;
   --nutri-score-d: #ff4444;
   --nutri-score-e: #cc0000;
-  --meal-breakfast: #fbbf24;
-  --meal-lunch: #60a5fa;
-  --meal-dinner: #f87171;
-  --meal-snack: #a78bfa;
+  --meal-breakfast: #ffe066;
+  --meal-lunch: #8ecae6;
+  --meal-dinner: #ffb4a2;
+  --meal-snack: #bdb2ff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card: #0a0a0a;
-    --card-foreground: #ededed;
-    --popover: #0a0a0a;
-    --popover-foreground: #ededed;
-    --primary: #22c55e;
-    --primary-foreground: #0a0a0a;
-    --secondary: #1e293b;
-    --secondary-foreground: #f1f5f9;
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    --accent: #1e293b;
-    --accent-foreground: #f1f5f9;
-    --destructive: #dc2626;
-    --destructive-foreground: #f1f5f9;
+    --background: #232946;
+    --foreground: #f4f4f4;
+    --card: #232946;
+    --card-foreground: #f4f4f4;
+    --popover: #232946;
+    --popover-foreground: #f4f4f4;
+    --primary: #ffb703;
+    --primary-foreground: #232946;
+    --secondary: #3a86ff;
+    --secondary-foreground: #f4f4f4;
+    --muted: #232946;
+    --muted-foreground: #bfc0c0;
+    --accent: #ffd6a5;
+    --accent-foreground: #232946;
+    --destructive: #ef476f;
+    --destructive-foreground: #fff;
     --border: #334155;
     --input: #334155;
-    --ring: #22c55e;
+    --ring: #ffb703;
   }
 }
 
@@ -68,87 +83,100 @@
 body {
   color: hsl(var(--foreground));
   background: hsl(var(--background));
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 @layer base {
   h1 {
-    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl font-nanum;
   }
-  
   h2 {
-    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 font-nanum;
   }
-  
   h3 {
-    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight font-nanum;
   }
-  
   h4 {
-    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+    @apply scroll-m-20 text-xl font-semibold tracking-tight font-nanum;
   }
-  
+  h5 {
+    @apply text-lg font-semibold tracking-tight font-nanum;
+  }
+  h6 {
+    @apply text-base font-semibold tracking-tight font-nanum;
+  }
   p {
-    @apply leading-7 [&:not(:first-child)]:mt-6;
+    @apply leading-7 [&:not(:first-child)]:mt-6 font-nunito;
+  }
+  .card-title {
+    @apply font-nanum;
+  }
+  .card-header {
+    @apply font-nanum;
   }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-full text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 shadow-md;
   }
-  
   .btn-primary {
-    @apply btn bg-primary text-primary-foreground hover:bg-primary/90;
+    @apply btn bg-primary text-primary-foreground hover:bg-yellow-400;
   }
-  
   .btn-secondary {
-    @apply btn bg-secondary text-secondary-foreground hover:bg-secondary/80;
+    @apply btn bg-secondary text-secondary-foreground hover:bg-blue-300;
   }
-  
+  .btn-accent {
+    @apply btn text-accent-foreground;
+    background-color: var(--pastel-yellow);
+  }
   .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+    @apply rounded-3xl border bg-card text-card-foreground shadow-lg p-6;
   }
-  
+  .card-cute {
+    @apply card border-0 shadow-xl;
+    background-color: var(--pastel-yellow);
+  }
   .meal-indicator {
     @apply w-4 h-1 rounded-full;
   }
-  
   .meal-breakfast {
-    @apply bg-yellow-400;
+    @apply bg-yellow-200;
   }
-  
   .meal-lunch {
-    @apply bg-blue-400;
+    @apply bg-blue-200;
   }
-  
   .meal-dinner {
-    @apply bg-red-400;
+    @apply bg-red-200;
   }
-  
   .meal-snack {
-    @apply bg-purple-400;
+    @apply bg-purple-200;
   }
-  
   .nutri-score-a {
-    @apply bg-green-500 text-white;
+    @apply bg-green-400 text-white;
   }
-  
   .nutri-score-b {
-    @apply bg-yellow-500 text-white;
+    @apply bg-yellow-400 text-white;
   }
-  
   .nutri-score-c {
-    @apply bg-orange-500 text-white;
+    @apply bg-orange-400 text-white;
   }
-  
   .nutri-score-d {
-    @apply bg-red-500 text-white;
+    @apply bg-red-400 text-white;
   }
-  
   .nutri-score-e {
     @apply bg-red-700 text-white;
   }
+}
+
+.font-nunito {
+  font-family: 'Nunito', 'Montserrat', sans-serif;
+}
+.font-baloo {
+  font-family: 'Baloo 2', 'Nunito', cursive;
+}
+
+.font-nanum {
+  font-family: 'NanumCute', 'Nunito', 'Montserrat', sans-serif;
 }
 
 /* 애니메이션 클래스 */

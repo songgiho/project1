@@ -140,7 +140,7 @@ export function MealUploader() {
         {/* 이미지 업로드 영역 */}
         <div className="space-y-6">
           <div className="card p-6">
-            <h2 className="text-xl font-semibold mb-4">사진 업로드</h2>
+            <h2 className="text-xl font-nanum mb-4">사진 업로드</h2>
             
             {!previewUrl ? (
               <div
@@ -201,7 +201,7 @@ export function MealUploader() {
         {/* 식사 정보 입력 폼 */}
         <div className="space-y-6">
           <div className="card p-6">
-            <h2 className="text-xl font-semibold mb-4">식사 정보</h2>
+            <h2 className="text-xl font-nanum mb-4">식사 정보</h2>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* 식사 종류 */}

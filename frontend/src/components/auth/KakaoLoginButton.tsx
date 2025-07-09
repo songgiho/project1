@@ -16,15 +16,16 @@ export function KakaoLoginButton() {
   return (
     <button
       onClick={handleKakaoLogin}
-      className="w-full bg-[#FEE500] hover:bg-[#FDD800] text-[#3C1E1E] font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-3 shadow-sm"
+      className="w-full btn-primary rounded-full py-3 px-4 flex items-center justify-center space-x-3 text-base font-bold shadow-lg"
+      style={{ background: '#FEE500', color: '#3C1E1E', border: 'none' }}
     >
       {/* 카카오 로고 */}
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 3C6.48 3 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-        <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+        <ellipse cx="12" cy="12" rx="10" ry="10" fill="#3C1E1E" />
+        <ellipse cx="12" cy="12" rx="9" ry="9" fill="#FEE500" />
+        <ellipse cx="12" cy="12" rx="7" ry="7" fill="#FEE500" />
+        <ellipse cx="12" cy="12" rx="5" ry="5" fill="#FEE500" />
       </svg>
-      
-      {/* 버튼 텍스트 */}
       <span>Continue with Kakao</span>
     </button>
   );

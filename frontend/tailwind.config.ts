@@ -2,9 +2,7 @@ import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -59,6 +57,12 @@ const config: Config = {
           dinner: 'var(--meal-dinner)',
           snack: 'var(--meal-snack)',
         },
+        'pastel-yellow': 'var(--pastel-yellow)',
+        'pastel-blue': 'var(--pastel-blue)',
+        'pastel-purple': 'var(--pastel-purple)',
+        'pastel-pink': 'var(--pastel-pink)',
+        'pastel-green': 'var(--pastel-green)',
+        // 필요시 추가 색상
       },
       borderRadius: {
         lg: 'var(--radius)',

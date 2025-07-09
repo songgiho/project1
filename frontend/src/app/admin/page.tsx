@@ -23,7 +23,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-4">관리자 대시보드</h1>
+      <h1 className="text-3xl font-nanum mb-4">관리자 대시보드</h1>
       <p className="text-lg text-muted-foreground">이 페이지는 관리자만 접근할 수 있습니다.</p>
     </div>
   );

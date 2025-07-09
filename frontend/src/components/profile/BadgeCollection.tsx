@@ -151,7 +151,7 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
           )}
         </div>
 
-        <h3 className={`font-semibold mb-2 ${
+        <h3 className={`font-nanum mb-2 font-nanum ${
           badge.isAcquired ? 'text-foreground' : 'text-muted-foreground'
         }`}>
           {badge.name}
@@ -177,24 +177,24 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
       {/* 통계 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card p-6 text-center">
-          <div className="text-3xl font-bold text-primary mb-2">
+          <div className="text-3xl font-nanum text-primary mb-2 font-nanum">
             {acquiredBadges.length}
           </div>
-          <div className="text-sm text-muted-foreground">획득한 배지</div>
+          <div className="text-sm text-muted-foreground font-nanum">획득한 배지</div>
         </div>
         
         <div className="card p-6 text-center">
-          <div className="text-3xl font-bold text-muted-foreground mb-2">
+          <div className="text-3xl font-nanum text-muted-foreground mb-2 font-nanum">
             {unacquiredBadges.length}
           </div>
-          <div className="text-sm text-muted-foreground">미획득 배지</div>
+          <div className="text-sm text-muted-foreground font-nanum">미획득 배지</div>
         </div>
         
         <div className="card p-6 text-center">
-          <div className="text-3xl font-bold text-orange-500 mb-2">
+          <div className="text-3xl font-nanum text-orange-500 mb-2 font-nanum">
             {Math.round((acquiredBadges.length / badges.length) * 100) || 0}%
           </div>
-          <div className="text-sm text-muted-foreground">수집률</div>
+          <div className="text-sm text-muted-foreground font-nanum">수집률</div>
         </div>
       </div>
 
@@ -215,7 +215,7 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
         <>
           {acquiredBadges.length > 0 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 flex items-center">
+              <h2 className="text-2xl font-nanum mb-6 flex items-center">
                 <Trophy className="w-6 h-6 text-yellow-500 mr-2" />
                 획득한 배지 ({acquiredBadges.length})
               </h2>
@@ -229,7 +229,7 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
 
           {unacquiredBadges.length > 0 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 flex items-center">
+              <h2 className="text-2xl font-nanum mb-6 flex items-center">
                 <Lock className="w-6 h-6 text-muted-foreground mr-2" />
                 미획득 배지 ({unacquiredBadges.length})
               </h2>
@@ -267,7 +267,7 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
                 )}
               </div>
 
-              <h3 className="text-xl font-bold mb-2">{selectedBadge.name}</h3>
+              <h3 className="text-xl font-nanum mb-2">{selectedBadge.name}</h3>
               <p className="text-muted-foreground mb-4">{selectedBadge.description}</p>
 
               {selectedBadge.isAcquired ? (

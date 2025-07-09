@@ -54,13 +54,10 @@ export function NutritionDonutChart({ carbs, protein, fat, totalCalories }: Nutr
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-medium">{data.name}</p>
-          <p className="text-sm text-muted-foreground">
+        <div className="bg-white bg-opacity-95 border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-medium font-nanum">{data.name}</p>
+          <p className="text-sm text-muted-foreground font-nanum">
             {data.grams}g ({data.percentage}%)
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {data.value}kcal
           </p>
         </div>
       );
@@ -87,9 +84,9 @@ export function NutritionDonutChart({ carbs, protein, fat, totalCalories }: Nutr
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-sm">{entry.value}</span>
+              <span className="text-sm font-nanum">{entry.value}</span>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground font-nanum">
               {entry.payload.grams}g ({entry.payload.percentage}%)
             </div>
           </div>
@@ -100,14 +97,14 @@ export function NutritionDonutChart({ carbs, protein, fat, totalCalories }: Nutr
 
   return (
     <div className="card p-6">
-      <h3 className="text-lg font-semibold mb-4">영양소 분석</h3>
+      <h3 className="text-lg font-semibold mb-4 font-nanum">영양소 분석</h3>
       
       {/* 총 칼로리 */}
       <div className="text-center mb-4">
-        <div className="text-3xl font-bold text-primary">
+        <div className="text-3xl font-bold text-primary font-nanum">
           {totalCalories.toLocaleString()}
         </div>
-        <div className="text-sm text-muted-foreground">총 칼로리 (kcal)</div>
+        <div className="text-sm text-muted-foreground font-nanum">총 칼로리 (kcal)</div>
       </div>
 
       {/* 도넛 차트 */}
@@ -119,7 +116,7 @@ export function NutritionDonutChart({ carbs, protein, fat, totalCalories }: Nutr
               cx="50%"
               cy="50%"
               innerRadius={60}
-              outerRadius={100}
+              outerRadius={80}
               paddingAngle={2}
               dataKey="value"
             >

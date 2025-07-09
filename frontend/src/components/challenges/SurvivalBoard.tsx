@@ -141,7 +141,7 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-lg font-bold">
+                <span className="text-lg font-nanum">
                   {participant.user.nickname.charAt(0)}
                 </span>
               )}
@@ -156,7 +156,7 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
           {/* 사용자 정보 */}
           <div className="flex-1">
             <div className="flex items-center space-x-2">
-              <h3 className="font-medium">{participant.user.nickname}</h3>
+              <h3 className="font-medium font-nanum">{participant.user.nickname}</h3>
               {isLeader && (
                 <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                   리더
@@ -178,11 +178,11 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
               ) : (
                 <Heart className="w-4 h-4" />
               )}
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium font-nanum">
                 {isEliminated ? '탈락' : '생존'}
               </span>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground font-nanum">
               {isEliminated ? (
                 participant.eliminationDate && 
                 `${format(new Date(participant.eliminationDate), 'M월 d일')} 탈락`
@@ -226,7 +226,7 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
       <div className="card p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{challenge.name}</h1>
+            <h1 className="text-3xl font-nanum mb-2">{challenge.name}</h1>
             <p className="text-muted-foreground">{challenge.description}</p>
           </div>
           <div className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -292,7 +292,7 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
               <Heart className="w-5 h-5 text-green-500" />
               <span className="font-medium">생존자</span>
             </div>
-            <span className="text-2xl font-bold text-green-500">
+            <span className="text-2xl font-nanum text-green-500">
               {survivedParticipants.length}
             </span>
           </div>
@@ -304,7 +304,7 @@ export function SurvivalBoard({ challengeId }: SurvivalBoardProps) {
               <Skull className="w-5 h-5 text-red-500" />
               <span className="font-medium">탈락자</span>
             </div>
-            <span className="text-2xl font-bold text-red-500">
+            <span className="text-2xl font-nanum text-red-500">
               {eliminatedParticipants.length}
             </span>
           </div>

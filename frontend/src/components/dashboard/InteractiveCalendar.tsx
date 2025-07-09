@@ -65,12 +65,21 @@ export function InteractiveCalendar() {
     setSelectedDate(dateStr);
   };
 
-  // 달력 날짜 생성
+  // 달력 날짜 생성 (실제 달력처럼 1일의 요일에 맞춰 시작)
   const daysInMonth = getDaysInMonth(currentDate);
+  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const startDay = firstDayOfMonth.getDay(); // 0(일)~6(토)
+
+  // 앞쪽 빈 칸
+  const leadingEmpty = Array.from({ length: startDay });
+  // 날짜 배열
   const calendarDays = Array.from({ length: daysInMonth }, (_, i) => {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i + 1);
     return date;
   });
+  // 뒤쪽 빈 칸 (마지막 날 이후)
+  const totalCells = startDay + daysInMonth;
+  const trailingEmpty = Array.from({ length: (7 - (totalCells % 7)) % 7 });
 
   // 식사 인디케이터 렌더링
   const renderMealIndicators = (date: Date) => {
@@ -95,23 +104,23 @@ export function InteractiveCalendar() {
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
   return (
-    <div className="card p-6">
+    <div className="card-cute p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-xl font-nanum text-foreground">
           {format(currentDate, 'yyyy년 M월')}
         </h2>
         <div className="flex items-center space-x-2">
           <button
             onClick={() => changeMonth('prev')}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
+            className="p-2 rounded-full bg-pastel-blue hover:bg-blue-200 transition-colors shadow"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => changeMonth('next')}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
+            className="p-2 rounded-full bg-pastel-blue hover:bg-blue-200 transition-colors shadow"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -125,14 +134,19 @@ export function InteractiveCalendar() {
           {/* 요일 헤더 */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekDays.map(day => (
-              <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
+              <div key={day} className="p-2 text-center text-base font-nanum text-pastel-purple font-nanum">
                 {day}
               </div>
             ))}
           </div>
 
           {/* 달력 그리드 */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-2">
+            {/* 앞쪽 빈 칸 */}
+            {leadingEmpty.map((_, idx) => (
+              <div key={`empty-start-${idx}`} />
+            ))}
+            {/* 날짜 */}
             {calendarDays.map(date => {
               const dateStr = format(date, 'yyyy-MM-dd');
               const dayData = calendarData?.days[dateStr];
@@ -143,31 +157,35 @@ export function InteractiveCalendar() {
                   key={dateStr}
                   onClick={() => handleDateClick(date)}
                   className={`
-                    p-2 h-20 rounded-lg border transition-colors relative
+                    p-2 h-20 rounded-2xl border transition-colors relative flex flex-col items-center justify-start bg-white shadow-sm
                     ${isSameMonth(date, currentDate) 
-                      ? 'bg-card hover:bg-muted' 
+                      ? 'hover:bg-pastel-yellow' 
                       : 'bg-muted/50 text-muted-foreground'
                     }
                     ${isToday(date) 
-                      ? 'border-primary bg-primary/5' 
+                      ? 'border-primary bg-primary/10' 
                       : 'border-border'
                     }
-                    ${hasLogs ? 'ring-1 ring-primary/20' : ''}
+                    ${hasLogs ? 'ring-2 ring-primary/30' : ''}
                   `}
                 >
-                  <div className="text-sm font-medium">
+                  <div className="text-base font-nanum font-nanum">
                     {format(date, 'd')}
                   </div>
                   {renderMealIndicators(date)}
                 </button>
               );
             })}
+            {/* 뒤쪽 빈 칸 */}
+            {trailingEmpty.map((_, idx) => (
+              <div key={`empty-end-${idx}`} />
+            ))}
           </div>
         </>
       )}
 
       {/* 범례 */}
-      <div className="mt-6 flex flex-wrap gap-4 text-sm">
+      <div className="mt-6 flex flex-wrap gap-4 text-sm font-nanum">
         <div className="flex items-center space-x-2">
           <div className="meal-indicator meal-breakfast" />
           <span>아침</span>

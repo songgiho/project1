@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const navigationItems = [
-  { href: '/dashboard', label: '대시보드', icon: Home },
+  // { href: '/dashboard', label: '대시보드', icon: Home }, // 대시보드 메뉴 제거
   { href: '/log', label: '식사 로그', icon: Camera },
   { href: '/challenges', label: '챌린지', icon: Trophy },
   { href: '/profile', label: '프로필', icon: User },
@@ -35,11 +35,8 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* 로고 */}
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <Brain className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Diet Survival</span>
+          <Link href="/dashboard" className="flex items-center">
+            <span className="text-xl font-nanum text-foreground font-nanum">체감</span>
           </Link>
 
           {/* 네비게이션 메뉴 */}
