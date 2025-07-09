@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Navigation } from '@/components/layout/Navigation';
+import { ConditionalNavigation } from '@/components/layout/ConditionalNavigation';
 
 export const metadata: Metadata = {
   title: 'Diet Survival - 다이어트 생존 게임',
@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <div className="min-h-screen bg-background">
-          <Navigation />
+          <ConditionalNavigation />
           <main className="container mx-auto px-4 py-8">
             {children}
           </main>

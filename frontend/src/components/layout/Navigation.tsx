@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   Home, 
   Camera, 
@@ -21,6 +21,14 @@ const navigationItems = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // 로컬 스토리지에서 토큰 제거
+    localStorage.removeItem('authToken');
+    // 로그인 페이지로 리다이렉트
+    router.push('/login');
+  };
 
   return (
     <nav className="bg-card border-b border-border">
@@ -62,7 +70,10 @@ export function Navigation() {
             <div className="hidden md:block text-sm text-muted-foreground">
               안녕하세요, 사용자님!
             </div>
-            <button className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
               <LogOut className="w-4 h-4" />
               <span className="hidden md:block">로그아웃</span>
             </button>
