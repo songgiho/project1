@@ -42,7 +42,7 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
               protein: 15,
               fat: 8,
               nutriScore: 'B',
-              imageUrl: '/api/placeholder/200/150'
+              time: '오전 8:00',
             },
             {
               id: '2',
@@ -54,7 +54,7 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
               protein: 35,
               fat: 12,
               nutriScore: 'A',
-              imageUrl: '/api/placeholder/200/150'
+              time: '오후 12:30',
             },
             {
               id: '3',
@@ -66,7 +66,7 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
               protein: 28,
               fat: 32,
               nutriScore: 'B',
-              imageUrl: '/api/placeholder/200/150'
+              time: '오후 6:40',
             },
             {
               id: '4',
@@ -78,7 +78,7 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
               protein: 7,
               fat: 13,
               nutriScore: 'C',
-              imageUrl: '/api/placeholder/200/150'
+              time: '오후 3:10',
             }
           ]
         });
@@ -147,9 +147,9 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
           </div>
         ) : dailyData ? (
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
               {/* 영양소 도넛 차트 */}
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 h-full flex flex-col">
                 <NutritionDonutChart
                   carbs={dailyData.totalCarbs}
                   protein={dailyData.totalProtein}
@@ -160,22 +160,13 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
 
               {/* 식사 목록 */}
               <div className="lg:col-span-2">
-                <h3 className="text-lg font-nanum mb-4 font-nanum">식사 목록</h3>
                 <div className="space-y-4">
                   {dailyData.meals.map((meal) => (
                     <div key={meal.id} className="bg-white rounded-2xl border border-border shadow p-4">
                       <div className="flex items-start space-x-4">
-                        {/* 식사 사진 */}
-                        <div className="relative w-20 h-20 rounded-lg bg-muted flex items-center justify-center">
-                          {meal.imageUrl ? (
-                            <img
-                              src={meal.imageUrl}
-                              alt={meal.foodName}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <Camera className="w-8 h-8 text-muted-foreground" />
-                          )}
+                        {/* 시간 정보 */}
+                        <div className="flex flex-col items-center justify-center w-20 h-20 rounded-lg bg-muted text-muted-foreground font-nanum text-sm">
+                          <span>{meal.time || '시간 정보 없음'}</span>
                         </div>
 
                         {/* 식사 정보 */}
@@ -187,8 +178,11 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
                                 {getMealTypeLabel(meal.mealType)}
                               </span>
                             </div>
-                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${getNutriScoreColor(meal.nutriScore)}`}>
-                              {meal.nutriScore}
+                            <div className="flex flex-col items-end">
+                              <span className="text-xs text-muted-foreground mb-0.5">Nutri-score</span>
+                              <div className={`px-2 py-1 rounded-full text-6xl font-extrabold drop-shadow ${getNutriScoreColor(meal.nutriScore)}`}>
+                                {meal.nutriScore}
+                              </div>
                             </div>
                           </div>
                           

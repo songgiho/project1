@@ -31,12 +31,12 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-card border-b border-border">
+    <nav className="bg-[#011936]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* 로고 */}
           <Link href="/dashboard" className="flex items-center">
-            <span className="text-xl font-nanum text-foreground font-nanum">체감</span>
+            <span className="text-base font-noto font-extrabold text-white">체감</span>
           </Link>
 
           {/* 네비게이션 메뉴 */}
@@ -49,11 +49,11 @@ export function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-2xl text-sm font-noto font-bold transition-colors
+                    ${isActive
+                      ? 'bg-white text-[#011936]'
+                      : 'text-white hover:bg-[#233a50] hover:text-white'}
+                  `}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{item.label}</span>
@@ -63,13 +63,13 @@ export function Navigation() {
           </div>
 
           {/* 사용자 메뉴 */}
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:block text-sm text-muted-foreground">
+          <div className="flex flex-col justify-end items-end gap-1 min-w-[110px]">
+            <div className="hidden md:block text-xs text-white font-noto">
               안녕하세요, 사용자님!
             </div>
             <button 
               onClick={handleLogout}
-              className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="flex items-center space-x-1 px-2 py-1 rounded-2xl text-xs font-noto font-bold text-white hover:bg-[#233a50] transition-colors"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden md:block">로그아웃</span>
@@ -78,7 +78,7 @@ export function Navigation() {
         </div>
 
         {/* 모바일 네비게이션 */}
-        <div className="md:hidden flex items-center justify-around py-2 border-t border-border">
+        <div className="md:hidden flex items-center justify-around py-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -87,13 +87,13 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-md text-xs font-medium transition-colors ${
-                  isActive
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-2xl text-xs font-noto font-bold transition-colors
+                  ${isActive
+                    ? 'bg-white text-[#011936]'
+                    : 'text-white hover:bg-[#233a50] hover:text-white'}
+                `}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4 h-4" />
                 <span>{item.label}</span>
               </Link>
             );

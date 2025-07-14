@@ -18,6 +18,7 @@ export interface MealLog {
   fat: number;
   nutriScore: 'A' | 'B' | 'C' | 'D' | 'E';
   imageUrl?: string;
+  time?: string;
 }
 
 export interface DailyNutrition {

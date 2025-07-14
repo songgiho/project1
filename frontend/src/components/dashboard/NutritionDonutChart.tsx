@@ -96,7 +96,7 @@ export function NutritionDonutChart({ carbs, protein, fat, totalCalories }: Nutr
   };
 
   return (
-    <div className="card p-6">
+    <div className="card p-6 h-full flex flex-col">
       <h3 className="text-lg font-semibold mb-4 font-nanum">영양소 분석</h3>
       
       {/* 총 칼로리 */}
