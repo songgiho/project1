@@ -50,6 +50,47 @@ export function InteractiveCalendar() {
                 { type: 'snack', hasLog: false },
               ]
             },
+            // 2025년 7월 테스트용 mock 데이터 (다양한 결식 패턴)
+            '2025-07-01': {
+              meals: [
+                { type: 'breakfast', hasLog: true },
+                { type: 'lunch', hasLog: true },
+                { type: 'dinner', hasLog: true },
+                { type: 'snack', hasLog: true },
+              ]
+            },
+            '2025-07-02': {
+              meals: [
+                { type: 'breakfast', hasLog: false }, // 아침 결식
+                { type: 'lunch', hasLog: true },
+                { type: 'dinner', hasLog: true },
+                { type: 'snack', hasLog: true },
+              ]
+            },
+            '2025-07-03': {
+              meals: [
+                { type: 'breakfast', hasLog: true },
+                { type: 'lunch', hasLog: false }, // 점심 결식
+                { type: 'dinner', hasLog: true },
+                { type: 'snack', hasLog: true },
+              ]
+            },
+            '2025-07-04': {
+              meals: [
+                { type: 'breakfast', hasLog: true },
+                { type: 'lunch', hasLog: true },
+                { type: 'dinner', hasLog: false }, // 저녁 결식
+                { type: 'snack', hasLog: true },
+              ]
+            },
+            '2025-07-05': {
+              meals: [
+                { type: 'breakfast', hasLog: true },
+                { type: 'lunch', hasLog: true },
+                { type: 'dinner', hasLog: true },
+                { type: 'snack', hasLog: false }, // 간식 결식
+              ]
+            },
           }
         });
       }
@@ -81,19 +122,35 @@ export function InteractiveCalendar() {
   const totalCells = startDay + daysInMonth;
   const trailingEmpty = Array.from({ length: (7 - (totalCells % 7)) % 7 });
 
-  // 식사 인디케이터 렌더링
-  const renderMealIndicators = (date: Date) => {
+  // 식사별 색상
+  const mealColors: Record<string, string> = {
+    breakfast: '#FFD600', // 노랑
+    lunch: '#00C853',     // 초록
+    dinner: '#2979FF',    // 파랑
+    snack: '#FF6D00',     // 주황
+  };
+
+  // 식사 인디케이터 렌더링 (세로 바)
+  const renderMealBarsVertical = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
     const dayData = calendarData?.days[dateStr];
-    
-    if (!dayData) return null;
-
+    const mealOrder: Array<'breakfast' | 'lunch' | 'dinner' | 'snack'> = ['breakfast', 'lunch', 'dinner', 'snack'];
+    if (!dayData) return (
+      <div className="flex flex-col w-full h-full justify-center mt-4">
+        {mealOrder.map((type, idx) => (
+          <div key={type} className={`w-full h-2 rounded bg-gray-200 ${idx < 3 ? 'mb-1' : ''}`} />
+        ))}
+      </div>
+    );
+    // meals 배열을 type 순서대로 정렬
+    const mealsSorted = mealOrder.map(type => dayData.meals.find(m => m.type === type) || { type, hasLog: false });
     return (
-      <div className="flex justify-center space-x-1 mt-1">
-        {dayData.meals.map((meal, index) => (
+      <div className="flex flex-col w-full h-full justify-center mt-4">
+        {mealsSorted.map((meal, idx) => (
           <div
-            key={index}
-            className={`meal-indicator ${meal.hasLog ? `meal-${meal.type}` : 'bg-gray-200'}`}
+            key={meal.type}
+            className={`w-full h-2 rounded ${idx < 3 ? 'mb-1' : ''}`}
+            style={{ background: meal.hasLog ? mealColors[meal.type] : '#E0E0E0' }}
           />
         ))}
       </div>
@@ -104,47 +161,43 @@ export function InteractiveCalendar() {
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
   return (
-    <div className="card-cute p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-nanum text-foreground">
+    <div>
+      {/* 헤더 */}
+      <div className="rounded-2xl rounded-b-none bg-[#011936] text-white flex items-center justify-between mb-0 p-6">
+        <h2 className="text-xl font-noto text-white">
           {format(currentDate, 'yyyy년 M월')}
         </h2>
         <div className="flex items-center space-x-2">
           <button
             onClick={() => changeMonth('prev')}
-            className="p-2 rounded-full bg-pastel-blue hover:bg-blue-200 transition-colors shadow"
+            className="p-2 rounded-full border-2 border-white bg-[#011936] hover:bg-white hover:text-[#011936] transition-colors shadow"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={() => changeMonth('next')}
-            className="p-2 rounded-full bg-pastel-blue hover:bg-blue-200 transition-colors shadow"
+            className="p-2 rounded-full border-2 border-white bg-[#011936] hover:bg-white hover:text-[#011936] transition-colors shadow"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5 text-white" />
           </button>
         </div>
       </div>
-
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">로딩 중...</div>
-        </div>
-      ) : (
-        <>
+      {/* 본문 */}
+      <div className="rounded-2xl rounded-t-none border-2 border-[#011936] bg-white shadow-lg p-8 -mt-2 h-full min-h-[400px] flex flex-col">
           {/* 요일 헤더 */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekDays.map(day => (
-              <div key={day} className="p-2 text-center text-base font-nanum text-pastel-purple font-nanum">
+              <div key={day} className="p-2 text-center text-base font-noto text-[#011936]">
                 {day}
               </div>
             ))}
           </div>
 
           {/* 달력 그리드 */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-2 flex-1 h-full min-h-[320px]">
             {/* 앞쪽 빈 칸 */}
             {leadingEmpty.map((_, idx) => (
-              <div key={`empty-start-${idx}`} />
+              <div key={`empty-start-${idx}`} className="h-full" />
             ))}
             {/* 날짜 */}
             {calendarDays.map(date => {
@@ -157,49 +210,48 @@ export function InteractiveCalendar() {
                   key={dateStr}
                   onClick={() => handleDateClick(date)}
                   className={`
-                    p-2 h-20 rounded-2xl border transition-colors relative flex flex-col items-center justify-start bg-white shadow-sm
+                    p-2 h-full flex-1 rounded-2xl border-2 border-[#011936] transition-colors relative flex flex-col items-stretch justify-start bg-white shadow-sm
                     ${isSameMonth(date, currentDate) 
-                      ? 'hover:bg-pastel-yellow' 
-                      : 'bg-muted/50 text-muted-foreground'
+                      ? 'hover:bg-[#F4FFFD]' 
+                      : 'bg-[#F4FFFD] text-[#011936] opacity-60'
                     }
                     ${isToday(date) 
-                      ? 'border-primary bg-primary/10' 
-                      : 'border-border'
+                      ? 'border-[#011936] bg-[#F4FFFD]' 
+                      : 'border-[#011936]'
                     }
-                    ${hasLogs ? 'ring-2 ring-primary/30' : ''}
+                    ${hasLogs ? 'ring-2 ring-[#011936] ring-opacity-30' : ''}
                   `}
                 >
-                  <div className="text-base font-nanum font-nanum">
-                    {format(date, 'd')}
+                  <span className="absolute left-1 top-1 text-xs font-bold text-[#011936]">{format(date, 'd')}</span>
+                  <div className="flex-1 flex flex-col justify-center">
+                    {renderMealBarsVertical(date)}
                   </div>
-                  {renderMealIndicators(date)}
                 </button>
               );
             })}
             {/* 뒤쪽 빈 칸 */}
             {trailingEmpty.map((_, idx) => (
-              <div key={`empty-end-${idx}`} />
+              <div key={`empty-end-${idx}`} className="h-full" />
             ))}
           </div>
-        </>
-      )}
+        </div>
 
       {/* 범례 */}
-      <div className="mt-6 flex flex-wrap gap-4 text-sm font-nanum">
+      <div className="mt-6 flex flex-wrap gap-4 text-sm font-noto text-[#011936]">
         <div className="flex items-center space-x-2">
-          <div className="meal-indicator meal-breakfast" />
+          <div className="w-8 h-2 rounded" style={{background: mealColors.breakfast}} />
           <span>아침</span>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="meal-indicator meal-lunch" />
+          <div className="w-8 h-2 rounded" style={{background: mealColors.lunch}} />
           <span>점심</span>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="meal-indicator meal-dinner" />
+          <div className="w-8 h-2 rounded" style={{background: mealColors.dinner}} />
           <span>저녁</span>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="meal-indicator meal-snack" />
+          <div className="w-8 h-2 rounded" style={{background: mealColors.snack}} />
           <span>간식</span>
         </div>
       </div>

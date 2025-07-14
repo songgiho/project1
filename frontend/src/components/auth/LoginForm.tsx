@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface LoginFormData {
   email: string;
@@ -13,6 +15,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const {
     register,
@@ -39,8 +42,8 @@ export function LoginForm() {
         if (result.user) {
           localStorage.setItem('user', JSON.stringify(result.user));
         }
-        // 로그인 성공 시 대시보드로 리다이렉트
-        window.location.href = '/dashboard';
+        // 로그인 성공 시 대시보드로 SPA 방식 이동
+        router.push('/dashboard');
       } else {
         const errorData = await response.json();
         setError(errorData.message || '로그인에 실패했습니다.');
@@ -67,12 +70,12 @@ export function LoginForm() {
               },
             })}
             type="email"
-            placeholder="Email"
-            className="w-full pl-10 pr-4 py-3 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white font-nunito text-base shadow-sm"
+            placeholder="이메일을 입력하세요."
+            className="w-full pl-10 pr-4 py-3 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white font-noto text-base shadow-sm placeholder:text-xs placeholder:text-muted-foreground"
           />
         </div>
         {errors.email && (
-          <p className="text-sm text-destructive mt-1 font-nunito">{errors.email.message}</p>
+          <p className="text-sm text-destructive mt-1 font-noto">{errors.email.message}</p>
         )}
       </div>
 
@@ -89,8 +92,8 @@ export function LoginForm() {
               },
             })}
             type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            className="w-full pl-10 pr-12 py-3 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white font-nunito text-base shadow-sm"
+            placeholder="비밀번호를 입력하세요."
+            className="w-full pl-10 pr-12 py-3 border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white font-noto text-base shadow-sm placeholder:text-xs placeholder:text-muted-foreground"
           />
           <button
             type="button"
@@ -101,13 +104,17 @@ export function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="text-sm text-destructive mt-1 font-nunito">{errors.password.message}</p>
+          <p className="text-sm text-destructive mt-1 font-noto">{errors.password.message}</p>
         )}
+        {/* 비밀번호 찾기 링크 */}
+        <div className="flex justify-end mt-1">
+          <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-primary font-noto">비밀번호 찾기</Link>
+        </div>
       </div>
 
       {/* 에러 메시지 */}
       {error && (
-        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-xl p-3 font-nunito">
+        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-xl p-3 font-noto">
           {error}
         </div>
       )}
@@ -116,10 +123,19 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full btn-primary rounded-full py-3 px-4 text-base font-bold shadow-md font-nunito"
+        className="w-full rounded-2xl py-3 px-4 text-base font-bold shadow-md font-noto"
+        style={{ background: '#011936', color: '#fff' }}
       >
-        {isLoading ? '로그인 중...' : 'Log In'}
+        {isLoading ? '로그인 중...' : '로그인'}
       </button>
+      {/* 회원가입 버튼 */}
+      <Link
+        href="/signup"
+        className="w-full rounded-2xl py-3 px-4 text-base font-bold shadow-md font-noto text-[#011936] bg-white border border-[#011936] flex items-center justify-center mt-2"
+        style={{}}
+      >
+        회원가입
+      </Link>
     </form>
   );
 } 
