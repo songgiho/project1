@@ -74,6 +74,42 @@ export const apiClient = {
     return response.data.data;
   },
 
+  // 새로운 챌린지 API들
+  joinChallenge: async (challengeId: string, userId: number): Promise<any> => {
+    const response = await api.post(`/api/v1/challenges/${challengeId}/join?user_id=${userId}`);
+    return response.data;
+  },
+
+  addChallengeRecord: async (challengeId: string, userId: number, recordData: any): Promise<any> => {
+    const response = await api.post(`/api/v1/challenges/${challengeId}/record?user_id=${userId}`, recordData);
+    return response.data;
+  },
+
+  getChallengeParticipants: async (challengeId: string): Promise<any[]> => {
+    const response = await api.get(`/api/v1/challenges/${challengeId}/participants`);
+    return response.data;
+  },
+
+  getChallengeRecords: async (challengeId: string): Promise<any[]> => {
+    const response = await api.get(`/api/v1/challenges/${challengeId}/records`);
+    return response.data;
+  },
+
+  getUserChallengeRecords: async (challengeId: string, userId: number): Promise<any[]> => {
+    const response = await api.get(`/api/v1/challenges/${challengeId}/records/${userId}`);
+    return response.data;
+  },
+
+  getChallengeStats: async (challengeId: string): Promise<any> => {
+    const response = await api.get(`/api/v1/challenges/${challengeId}/stats`);
+    return response.data;
+  },
+
+  getChallengeLeaderboard: async (challengeId: string): Promise<any[]> => {
+    const response = await api.get(`/api/v1/challenges/${challengeId}/leaderboard`);
+    return response.data;
+  },
+
   // AI 코치 관련 API
   getCoachingTip: async (): Promise<AICoachTip> => {
     const response = await api.get<ApiResponse<AICoachTip>>('/api/ai/coaching-tip');

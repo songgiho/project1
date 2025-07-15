@@ -52,7 +52,8 @@ export interface Challenge {
   targetType: 'weight' | 'calorie' | 'macro';
   targetValue: number;
   isActive: boolean;
-  participants: ChallengeParticipant[];
+  participants: any[];
+  maxParticipants?: number;
 }
 
 export interface ChallengeParticipant {

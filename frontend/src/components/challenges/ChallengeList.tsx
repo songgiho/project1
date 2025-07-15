@@ -36,7 +36,8 @@ export function ChallengeList() {
             targetType: 'calorie' as const,
             targetValue: 1800,
             isActive: true,
-            participants: []
+            participants: [],
+            maxParticipants: 10,
           },
           {
             id: '2',
@@ -47,7 +48,8 @@ export function ChallengeList() {
             targetType: 'macro' as const,
             targetValue: 100,
             isActive: true,
-            participants: []
+            participants: [],
+            maxParticipants: 8,
           },
           {
             id: '3',
@@ -58,7 +60,8 @@ export function ChallengeList() {
             targetType: 'weight' as const,
             targetValue: 5,
             isActive: false,
-            participants: []
+            participants: [],
+            maxParticipants: 20,
           }
         ];
         setRecommendedChallenges(tempChallenges);
@@ -101,82 +104,60 @@ export function ChallengeList() {
     const daysLeft = calculateDaysLeft(challenge.endDate);
     
     return (
-      <div className="card p-6 hover:shadow-lg transition-shadow">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <TargetIcon className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-lg font-nanum font-nanum">{challenge.name}</h3>
-              <p className="text-sm text-muted-foreground font-nanum">
-                {getTargetTypeLabel(challenge.targetType)} 목표
-              </p>
-            </div>
+      <div className={`relative rounded-2xl border shadow p-6 flex flex-col min-h-[420px] transition
+        ${challenge.isActive ? 'bg-white shadow-lg' : 'bg-gray-100 opacity-70'}
+      `}>
+        {/* 상태 불빛 인디케이터 + 툴팁 */}
+        <span
+          className={`absolute top-4 left-4 w-4 h-4 rounded-full z-10 border-2 border-white
+            ${challenge.isActive ? 'bg-green-400 shadow-green-200 shadow' : 'bg-gray-300'}
+          `}
+          title={challenge.isActive ? '진행 중' : '종료'}
+        />
+        {/* 타이틀/아이콘 */}
+        <div className="flex items-center space-x-2 mb-2">
+          <div className={`p-2 rounded-lg ${challenge.isActive ? 'bg-primary/10' : 'bg-gray-200'}`}> 
+            <TargetIcon className={`w-5 h-5 ${challenge.isActive ? 'text-primary' : 'text-gray-400'}`} />
           </div>
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-            challenge.isActive 
-              ? 'bg-green-100 text-green-700' 
-              : 'bg-gray-100 text-gray-700'
-          }`}>
-            {challenge.isActive ? '진행 중' : '종료'}
-          </div>
+          <h3 className={`text-xl font-extrabold font-nanum ${challenge.isActive ? 'text-foreground' : 'text-gray-400'}`}>{challenge.name}</h3>
         </div>
-
-        <p className="text-sm text-muted-foreground mb-4 font-nanum">
-          {challenge.description}
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <div className="flex items-center space-x-2 text-sm">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span>기간</span>
-            </div>
-            <div className="text-sm font-medium mt-1">
+        {/* 목표/설명 */}
+        <div className={`mb-4 text-sm font-nanum ${challenge.isActive ? 'text-muted-foreground' : 'text-gray-400'}`}>{challenge.description}</div>
+        {/* 기간/참여자 */}
+        <div className="flex items-center justify-between text-xs mb-4">
+          <div className="flex items-center space-x-2">
+            <Calendar className={`w-4 h-4 ${challenge.isActive ? 'text-muted-foreground' : 'text-gray-400'}`} />
+            <span>기간</span>
+            <span className="font-medium ml-1">
               {format(new Date(challenge.startDate), 'M월 d일')} - {format(new Date(challenge.endDate), 'M월 d일')}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center space-x-2 text-sm">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <span>참여자</span>
-            </div>
-            <div className="text-sm font-medium mt-1">
-              {challenge.participants.length}명
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-nanum">
-            <span className="text-muted-foreground">목표: </span>
-            <span className="font-medium font-nanum">
-              {challenge.targetValue}
-              {challenge.targetType === 'calorie' && 'kcal'}
-              {challenge.targetType === 'macro' && 'g'}
-              {challenge.targetType === 'weight' && 'kg'}
             </span>
           </div>
-          
-          {challenge.isActive && (
-            <div className="text-sm font-nanum">
-              <span className="text-muted-foreground">남은 기간: </span>
-              <span className="font-medium text-primary font-nanum">
-                {daysLeft > 0 ? `${daysLeft}일` : '종료'}
-              </span>
+          <div className="flex flex-col items-start">
+            <div className="flex items-center space-x-2">
+              <Users className={`w-4 h-4 ${challenge.isActive ? 'text-muted-foreground' : 'text-gray-400'}`} />
+              <span>참여자</span>
             </div>
-          )}
+            <span className="font-medium ml-6 mt-1">{challenge.participants.length}/{challenge.maxParticipants ?? '-'}명</span>
+          </div>
         </div>
-
-        <div className="mt-4 pt-4 border-t border-border">
-          <Link
-            href={`/challenges/${challenge.id}`}
-            className="w-full btn-primary py-2 text-center block"
-          >
-            {activeTab === 'recommended' ? '참여하기' : '자세히 보기'}
-          </Link>
+        {/* 목표/남은 기간 */}
+        <div className="flex items-center justify-between text-xs mb-6">
+          <span>목표: <span className="font-bold">{challenge.targetValue}{challenge.targetType === 'calorie' && 'kcal'}{challenge.targetType === 'macro' && 'g'}{challenge.targetType === 'weight' && 'kg'}</span></span>
+          <span>남은 기간: <span className="font-bold text-primary">{challenge.isActive ? (daysLeft > 0 ? `${daysLeft}일` : '종료') : '종료'}</span></span>
         </div>
+        {/* 하단 버튼 */}
+        <Link
+          href={challenge.isActive ? `/challenges/${challenge.id}` : '#'}
+          className={`mt-auto w-full py-3 rounded-2xl font-bold shadow text-center block transition
+            ${challenge.isActive
+              ? 'bg-[#011936] text-white hover:bg-[#02224d] cursor-pointer'
+              : 'bg-gray-300 text-gray-400 cursor-not-allowed pointer-events-none'}
+          `}
+          tabIndex={challenge.isActive ? 0 : -1}
+          aria-disabled={!challenge.isActive}
+        >
+          {challenge.isActive ? (activeTab === 'recommended' ? '참여하기' : '자세히 보기') : '종료됨'}
+        </Link>
       </div>
     );
   };
@@ -209,9 +190,9 @@ export function ChallengeList() {
 
       {/* 챌린지 생성 버튼 */}
       <div className="flex justify-end">
-        <button className="btn-primary flex items-center space-x-2">
+        <button className="btn-primary flex items-center space-x-2 min-w-[120px] px-5 py-2">
           <Plus className="w-4 h-4" />
-          <span>새 챌린지 생성</span>
+          <span className="text-xs font-medium">새 챌린지 생성</span>
         </button>
       </div>
 

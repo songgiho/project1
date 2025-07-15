@@ -6,7 +6,7 @@ SQLAlchemy를 사용하여 PostgreSQL과 연결합니다.
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from app.config import settings
+from backend.app.config import settings
 
 # 데이터베이스 엔진 생성
 engine = create_engine(
