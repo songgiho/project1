@@ -35,12 +35,16 @@ export function MealUploader() {
   });
 
   const watchedValues = watch();
+  const [aiComment, setAiComment] = useState<string | null>(null);
 
   // 파일 선택 핸들러
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    if (!file) {
+      alert("이미지 파일을 선택하세요.");
+      return;
+    }
+    setSelectedFile(file);
       
       // 미리보기 URL 생성
       const url = URL.createObjectURL(file);
@@ -48,7 +52,6 @@ export function MealUploader() {
 
       // AI 분석 시작
       analyzeImage(file);
-    }
   };
 
   // AI 이미지 분석
@@ -60,20 +63,15 @@ export function MealUploader() {
       // 분석 결과로 폼 필드 자동 채우기
       if (result.foodName) setValue('foodName', result.foodName);
       if (result.calories) setValue('calories', result.calories);
-      if (result.carbs) setValue('carbs', result.carbs);
-      if (result.protein) setValue('protein', result.protein);
-      if (result.fat) setValue('fat', result.fat);
-      if (result.nutriScore) setValue('nutriScore', result.nutriScore);
-      
+      if (result.carbs !== undefined) setValue('carbs', result.carbs);
+      if (result.protein !== undefined) setValue('protein', result.protein);
+      if (result.fat !== undefined) setValue('fat', result.fat);
+      if (result.grade) setValue('nutriScore', result.grade);
+      else if (result.nutriScore) setValue('nutriScore', result.nutriScore);
+      if (result.aiComment) setAiComment(result.aiComment);
     } catch (error) {
       console.error('Image analysis failed:', error);
-      // 임시 데이터로 폼 채우기
-      setValue('foodName', '닭가슴살 샐러드');
-      setValue('calories', 350);
-      setValue('carbs', 25);
-      setValue('protein', 30);
-      setValue('fat', 15);
-      setValue('nutriScore', 'A');
+      setAiComment('음식 인식에 실패했습니다. 직접 입력해 주세요.');
     }
     setAnalyzing(false);
   };
@@ -84,8 +82,7 @@ export function MealUploader() {
     try {
       const mealData = {
         ...data,
-        date: new Date().toISOString().split('T')[0],
-        imageUrl: previewUrl || undefined
+        date: new Date().toISOString().split('T')[0]
       };
       
       await apiClient.createMealLog(mealData);
@@ -183,6 +180,7 @@ export function MealUploader() {
               id="file-input"
               type="file"
               accept="image/*"
+              name="image"
               onChange={handleFileSelect}
               className="hidden"
             />
@@ -202,6 +200,11 @@ export function MealUploader() {
         <div className="space-y-6">
           <div className="card p-6">
             <h2 className="text-xl font-nanum mb-4">식사 정보</h2>
+            {aiComment && (
+              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+                {aiComment}
+              </div>
+            )}
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* 식사 종류 */}
@@ -253,6 +256,7 @@ export function MealUploader() {
                   <input
                     {...register('carbs', { required: true, min: 0 })}
                     type="number"
+                    step="any"
                     className="w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="25"
                   />
@@ -262,6 +266,7 @@ export function MealUploader() {
                   <input
                     {...register('protein', { required: true, min: 0 })}
                     type="number"
+                    step="any"
                     className="w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="30"
                   />
@@ -271,6 +276,7 @@ export function MealUploader() {
                   <input
                     {...register('fat', { required: true, min: 0 })}
                     type="number"
+                    step="any"
                     className="w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="15"
                   />

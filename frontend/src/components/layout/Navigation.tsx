@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
@@ -8,39 +8,49 @@ import {
   Camera, 
   Trophy, 
   User,
-  Brain,
-  LogOut
+  BarChart2,
+  LogOut,
+  Menu,
+  X
 } from 'lucide-react';
 
 const navigationItems = [
-  // { href: '/dashboard', label: '대시보드', icon: Home }, // 대시보드 메뉴 제거
-  { href: '/log', label: '식사 로그', icon: Camera },
+  { href: '/dashboard', label: '대시보드', icon: Home },
+  { href: '/log', label: '식사 기록', icon: Camera },
   { href: '/challenges', label: '챌린지', icon: Trophy },
-  { href: '/profile', label: '프로필', icon: User },
+  { href: '/statistics', label: '통계', icon: BarChart2 },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
+  const [username, setUsername] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // 클라이언트 사이드에서만 실행
+    if (typeof window !== 'undefined') {
+      setUsername(localStorage.getItem('username'));
+    }
+  }, []);
 
   const handleLogout = () => {
-    // 로컬 스토리지에서 토큰 제거
     localStorage.removeItem('authToken');
-    // 로그인 페이지로 리다이렉트
+    localStorage.removeItem('username');
     router.push('/login');
   };
 
   return (
-    <nav className="bg-[#011936]">
+    <nav className="bg-[#011936] sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* 로고 */}
           <Link href="/dashboard" className="flex items-center">
-            <span className="text-base font-noto font-extrabold text-white">체감</span>
+            <span className="text-xl font-extrabold text-white">체감</span>
           </Link>
 
-          {/* 네비게이션 메뉴 */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* 데스크탑 네비게이션 */}
+          <div className="hidden md:flex items-center space-x-6">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -49,7 +59,7 @@ export function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-2xl text-sm font-noto font-bold transition-colors
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-bold transition-colors
                     ${isActive
                       ? 'bg-white text-[#011936]'
                       : 'text-white hover:bg-[#233a50] hover:text-white'}
@@ -63,43 +73,96 @@ export function Navigation() {
           </div>
 
           {/* 사용자 메뉴 */}
-          <div className="flex flex-col justify-end items-end gap-1 min-w-[110px]">
-            <div className="hidden md:block text-xs text-white font-noto">
-              안녕하세요, 사용자님!
-            </div>
-            <button 
-              onClick={handleLogout}
-              className="flex items-center space-x-1 px-2 py-1 rounded-2xl text-xs font-noto font-bold text-white hover:bg-[#233a50] transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden md:block">로그아웃</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 모바일 네비게이션 */}
-        <div className="md:hidden flex items-center justify-around py-2">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            
-            return (
+          <div className="hidden md:flex items-center space-x-4">
+            {username && (
               <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-2xl text-xs font-noto font-bold transition-colors
-                  ${isActive
+                href={`/profile/${username}`}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-bold transition-colors
+                  ${pathname.startsWith(`/profile/${username}`)
                     ? 'bg-white text-[#011936]'
                     : 'text-white hover:bg-[#233a50] hover:text-white'}
                 `}
               >
-                <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
+                <User className="w-4 h-4" />
+                <span>{username}</span>
               </Link>
-            );
-          })}
+            )}
+            <button 
+              onClick={handleLogout}
+              className="flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-bold text-white hover:bg-[#233a50] transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>로그아웃</span>
+            </button>
+          </div>
+
+          {/* 모바일 메뉴 버튼 */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white p-2"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* 모바일 메뉴 */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-2 space-y-1 animate-fade-in">
+            {navigationItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-bold transition-colors
+                    ${isActive
+                      ? 'bg-white text-[#011936]'
+                      : 'text-white hover:bg-[#233a50] hover:text-white'}
+                  `}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+            
+            {username && (
+              <Link
+                href={`/profile/${username}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-bold transition-colors
+                  ${pathname.startsWith(`/profile/${username}`)
+                    ? 'bg-white text-[#011936]'
+                    : 'text-white hover:bg-[#233a50] hover:text-white'}
+                `}
+              >
+                <User className="w-5 h-5" />
+                <span>프로필</span>
+              </Link>
+            )}
+            
+            <button 
+              onClick={() => {
+                handleLogout();
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-xl text-sm font-bold text-white hover:bg-[#233a50] transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>로그아웃</span>
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
-} 
+}

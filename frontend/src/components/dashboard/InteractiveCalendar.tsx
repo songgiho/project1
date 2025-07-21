@@ -29,70 +29,7 @@ export function InteractiveCalendar() {
         setCalendarData(data);
       } catch (error) {
         console.error('Failed to load calendar data:', error);
-        // 임시 데이터 사용
-        setCalendarData({
-          year: currentDate.getFullYear(),
-          month: currentDate.getMonth() + 1,
-          days: {
-            '2025-01-15': {
-              meals: [
-                { type: 'breakfast', hasLog: true },
-                { type: 'lunch', hasLog: true },
-                { type: 'dinner', hasLog: false },
-                { type: 'snack', hasLog: true },
-              ]
-            },
-            '2025-01-16': {
-              meals: [
-                { type: 'breakfast', hasLog: true },
-                { type: 'lunch', hasLog: true },
-                { type: 'dinner', hasLog: true },
-                { type: 'snack', hasLog: false },
-              ]
-            },
-            // 2025년 7월 테스트용 mock 데이터 (다양한 결식 패턴)
-            '2025-07-01': {
-              meals: [
-                { type: 'breakfast', hasLog: true },
-                { type: 'lunch', hasLog: true },
-                { type: 'dinner', hasLog: true },
-                { type: 'snack', hasLog: true },
-              ]
-            },
-            '2025-07-02': {
-              meals: [
-                { type: 'breakfast', hasLog: false }, // 아침 결식
-                { type: 'lunch', hasLog: true },
-                { type: 'dinner', hasLog: true },
-                { type: 'snack', hasLog: true },
-              ]
-            },
-            '2025-07-03': {
-              meals: [
-                { type: 'breakfast', hasLog: true },
-                { type: 'lunch', hasLog: false }, // 점심 결식
-                { type: 'dinner', hasLog: true },
-                { type: 'snack', hasLog: true },
-              ]
-            },
-            '2025-07-04': {
-              meals: [
-                { type: 'breakfast', hasLog: true },
-                { type: 'lunch', hasLog: true },
-                { type: 'dinner', hasLog: false }, // 저녁 결식
-                { type: 'snack', hasLog: true },
-              ]
-            },
-            '2025-07-05': {
-              meals: [
-                { type: 'breakfast', hasLog: true },
-                { type: 'lunch', hasLog: true },
-                { type: 'dinner', hasLog: true },
-                { type: 'snack', hasLog: false }, // 간식 결식
-              ]
-            },
-          }
-        });
+        setCalendarData(null);
       }
       setLoading(false);
     };

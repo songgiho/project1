@@ -14,18 +14,11 @@ export function AICoachTip({ onClose }: { onClose?: () => void }) {
     const loadTip = async () => {
       setLoading(true);
       try {
-        const data = await apiClient.getCoachingTip();
-        setTip(data);
+        const tip = await apiClient.getCoachingTip();
+        setTip(tip);
       } catch (error) {
         console.error('Failed to load coaching tip:', error);
-        // 임시 데이터 사용
-        setTip({
-          id: '1',
-          message: '최근 탄수화물 섭취가 많았어요. 내일은 밥 양을 절반으로 줄이고 단백질을 늘려보세요. 생존 확률을 높일 수 있습니다!',
-          type: 'suggestion',
-          priority: 'high',
-          createdAt: new Date().toISOString()
-        });
+        setTip(null);
       }
       setLoading(false);
     };

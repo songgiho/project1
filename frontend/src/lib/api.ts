@@ -13,16 +13,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Content-Type 헤더 제거 (FormData 전송을 위해)
 });
 
 // 인터셉터 설정 (토큰 인증 등)
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Token ${token}`;
   }
   return config;
 });
@@ -41,72 +39,62 @@ export const apiClient = {
   },
 
   // 식사 로그 관련 API
-  analyzeImage: async (imageFile: File): Promise<Partial<MealLog>> => {
+  analyzeImage: async (file: File) => {
     const formData = new FormData();
-    formData.append('image', imageFile);
-    
-    const response = await api.post<ApiResponse<Partial<MealLog>>>('/api/logs/analyze-image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    formData.append('image', file);
+    const token = localStorage.getItem('authToken');
+    const response = await api.post(
+      '/api/logs/analyze-image/', // 반드시 슬래시 포함
+      formData,
+      {
+        headers: {
+          ...(token ? { 'Authorization': `Token ${token}` } : {})
+          // Content-Type을 지정하지 않음! (axios가 자동 처리)
+        },
+      }
+    );
     return response.data.data;
   },
 
   createMealLog: async (mealData: Omit<MealLog, 'id'>): Promise<MealLog> => {
-    const response = await api.post<ApiResponse<MealLog>>('/api/logs', mealData);
+    const response = await api.post<ApiResponse<MealLog>>('/api/logs/', mealData);
     return response.data.data;
   },
 
   // 챌린지 관련 API
   getRecommendedChallenges: async (): Promise<Challenge[]> => {
-    const response = await api.get<ApiResponse<Challenge[]>>('/api/challenges/recommended');
+    const response = await api.get<ApiResponse<Challenge[]>>('/api/challenge-main/challenges/');
     return response.data.data;
   },
 
   getMyChallenges: async (): Promise<Challenge[]> => {
-    const response = await api.get<ApiResponse<Challenge[]>>('/api/challenges/my-list');
+    const response = await api.get<ApiResponse<Challenge[]>>('/api/challenge-main/challenges/my_challenges/');
     return response.data.data;
   },
 
   getChallengeDetails: async (challengeId: string): Promise<Challenge> => {
-    const response = await api.get<ApiResponse<Challenge>>(`/api/challenges/${challengeId}`);
+    const response = await api.get<ApiResponse<Challenge>>(`/api/challenge-main/challenges/${challengeId}/`);
     return response.data.data;
   },
 
-  // 새로운 챌린지 API들
-  joinChallenge: async (challengeId: string, userId: number): Promise<any> => {
-    const response = await api.post(`/api/v1/challenges/${challengeId}/join?user_id=${userId}`);
+  leaveChallenge: async (challengeId: string) => {
+    const response = await api.post(`/api/challenge-main/challenges/${challengeId}/leave/`);
     return response.data;
   },
 
-  addChallengeRecord: async (challengeId: string, userId: number, recordData: any): Promise<any> => {
-    const response = await api.post(`/api/v1/challenges/${challengeId}/record?user_id=${userId}`, recordData);
+  createChallenge: async (challengeData: any) => {
+    const response = await api.post('/api/challenge-main/challenges/', challengeData);
     return response.data;
   },
 
-  getChallengeParticipants: async (challengeId: string): Promise<any[]> => {
-    const response = await api.get(`/api/v1/challenges/${challengeId}/participants`);
+  joinChallenge: async (challengeId: string) => {
+    const response = await api.post(`/api/challenge-main/challenges/${challengeId}/join/`);
     return response.data;
   },
 
-  getChallengeRecords: async (challengeId: string): Promise<any[]> => {
-    const response = await api.get(`/api/v1/challenges/${challengeId}/records`);
-    return response.data;
-  },
-
-  getUserChallengeRecords: async (challengeId: string, userId: number): Promise<any[]> => {
-    const response = await api.get(`/api/v1/challenges/${challengeId}/records/${userId}`);
-    return response.data;
-  },
-
-  getChallengeStats: async (challengeId: string): Promise<any> => {
-    const response = await api.get(`/api/v1/challenges/${challengeId}/stats`);
-    return response.data;
-  },
-
-  getChallengeLeaderboard: async (challengeId: string): Promise<any[]> => {
-    const response = await api.get(`/api/v1/challenges/${challengeId}/leaderboard`);
+  // 챌린지 진행상황(Progress) 조회 API 추가
+  getChallengeProgress: async (challengeId: string) => {
+    const response = await api.get(`/api/challenge-main/progress/challenge_progress/?challenge_id=${challengeId}`);
     return response.data;
   },
 
@@ -120,6 +108,29 @@ export const apiClient = {
   getUserBadges: async (username: string): Promise<Badge[]> => {
     const response = await api.get<ApiResponse<Badge[]>>(`/api/users/${username}/badges`);
     return response.data.data;
+  },
+
+  // 사용자 통계 API
+  getUserStatistics: async (): Promise<any> => {
+    const response = await api.get('/api/users/statistics');
+    return response.data.data;
+  },
+
+  // 사용자 프로필 통계 API
+  getUserProfileStats: async (username: string): Promise<any> => {
+    const response = await api.get(`/api/users/profile/stats`, { params: { username } });
+    return response.data.data;
+  },
+
+  // 내 식사 기록 API
+  getMyMealLogs: async (): Promise<any[]> => {
+    const response = await api.get('/api/logs/');
+    return response.data.data;
+  },
+
+  // 식사 기록 삭제 API
+  deleteMealLog: async (id: string | number): Promise<void> => {
+    await api.delete(`/api/logs/${id}/`);
   },
 };
 

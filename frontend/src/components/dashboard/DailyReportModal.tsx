@@ -24,70 +24,26 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
         setDailyData(data);
       } catch (error) {
         console.error('Failed to load daily data:', error);
-        // 임시 데이터 사용
-        setDailyData({
-          date,
-          totalCalories: 1650,
-          totalCarbs: 180,
-          totalProtein: 85,
-          totalFat: 65,
-          meals: [
-            {
-              id: '1',
-              date,
-              mealType: 'breakfast',
-              foodName: '현미밥과 된장국',
-              calories: 450,
-              carbs: 65,
-              protein: 15,
-              fat: 8,
-              nutriScore: 'B',
-              time: '오전 8:00',
-            },
-            {
-              id: '2',
-              date,
-              mealType: 'lunch',
-              foodName: '닭가슴살 샐러드',
-              calories: 320,
-              carbs: 25,
-              protein: 35,
-              fat: 12,
-              nutriScore: 'A',
-              time: '오후 12:30',
-            },
-            {
-              id: '3',
-              date,
-              mealType: 'dinner',
-              foodName: '연어 스테이크',
-              calories: 580,
-              carbs: 45,
-              protein: 28,
-              fat: 32,
-              nutriScore: 'B',
-              time: '오후 6:40',
-            },
-            {
-              id: '4',
-              date,
-              mealType: 'snack',
-              foodName: '견과류 믹스',
-              calories: 300,
-              carbs: 45,
-              protein: 7,
-              fat: 13,
-              nutriScore: 'C',
-              time: '오후 3:10',
-            }
-          ]
-        });
+        setDailyData(null);
       }
       setLoading(false);
     };
 
     loadDailyData();
   }, [date]);
+
+  // 삭제 기능
+  const handleDelete = async (id: string | number) => {
+    if (!window.confirm('정말로 삭제하시겠습니까?')) return;
+    try {
+      await apiClient.deleteMealLog(id);
+      // 삭제 후 데이터 갱신
+      const data = await apiClient.getDailyReport(date);
+      setDailyData(data);
+    } catch (error) {
+      alert('삭제에 실패했습니다.');
+    }
+  };
 
   const getNutriScoreColor = (score: string) => {
     switch (score) {
@@ -183,6 +139,12 @@ export function DailyReportModal({ date, onClose }: DailyReportModalProps) {
                               <div className={`px-2 py-1 rounded-full text-6xl font-extrabold drop-shadow ${getNutriScoreColor(meal.nutriScore)}`}>
                                 {meal.nutriScore}
                               </div>
+                             <button
+                               className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
+                               onClick={() => handleDelete(meal.id)}
+                             >
+                               삭제
+                             </button>
                             </div>
                           </div>
                           

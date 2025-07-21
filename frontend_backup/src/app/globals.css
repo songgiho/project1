@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;300;400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fff;
+  --foreground: #011936;
+  --card: #fff;
+  --card-foreground: #011936;
+  --border: #011936;
+  --input: #011936;
+  --radius: 1.2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #011936;
+    --foreground: #F4FFFD;
+    --card: #011936;
+    --card-foreground: #F4FFFD;
+    --border: #F4FFFD;
+    --input: #F4FFFD;
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Noto Sans', sans-serif;
+}
+
+@layer base {
+  h1 {
+    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl font-noto;
+  }
+  h2 {
+    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 font-noto;
+  }
+  h3 {
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight font-noto;
+  }
+  h4 {
+    @apply scroll-m-20 text-xl font-semibold tracking-tight font-noto;
+  }
+  h5 {
+    @apply text-lg font-semibold tracking-tight font-noto;
+  }
+  h6 {
+    @apply text-base font-semibold tracking-tight font-noto;
+  }
+  p {
+    @apply leading-7 [&:not(:first-child)]:mt-6 font-noto;
+  }
+  .card-title {
+    @apply font-noto;
+  }
+  .card-header {
+    @apply font-noto;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-base font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#011936] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 shadow-md;
+  }
+  .btn-primary {
+    @apply btn bg-[#011936] text-white hover:bg-[#011936]/90;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-[#011936] border border-[#011936] hover:bg-[#F4FFFD];
+  }
+  .card {
+    @apply rounded-2xl border bg-card text-card-foreground shadow-lg p-8;
+  }
+  .card-cute {
+    @apply card border-0 shadow-xl;
+    background-color: transparent;
+  }
+}
+
+.font-noto {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4FFFD;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #01193622;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #011936;
+}
