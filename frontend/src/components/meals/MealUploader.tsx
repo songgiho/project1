@@ -9,6 +9,7 @@ interface MealFormData {
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   foodName: string;
   calories: number;
+  mass: number;  // 질량 정보 추가
   carbs: number;
   protein: number;
   fat: number;
@@ -21,12 +22,14 @@ export function MealUploader() {
   const [analyzing, setAnalyzing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [analysisMethod, setAnalysisMethod] = useState<'gemini' | 'mlserver'>('gemini');
   
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<MealFormData>({
     defaultValues: {
       mealType: 'lunch',
       foodName: '',
       calories: 0,
+      mass: 0,  // 질량 기본값 추가
       carbs: 0,
       protein: 0,
       fat: 0,
@@ -36,6 +39,94 @@ export function MealUploader() {
 
   const watchedValues = watch();
   const [aiComment, setAiComment] = useState<string | null>(null);
+
+  // MLServer 작업 모니터링 함수
+  const monitorMLServerTask = async (taskId: string) => {
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(`ws://localhost:8000/ws/task/${taskId}/`);
+      
+      ws.onopen = () => {
+        console.log('WebSocket 연결됨:', taskId);
+        setAiComment('MLServer에서 이미지를 분석하는 중입니다... (연결됨)');
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('WebSocket 메시지:', data);
+          
+          // Django 백엔드 메시지 형식에 맞게 처리
+          if (data.type === 'task_update' && data.data) {
+            const taskData = data.data;
+            const progress = Math.round((taskData.progress || 0) * 100);
+            setAiComment(`MLServer 분석 중... ${progress}% 완료 - ${taskData.message || ''}`);
+            
+          } else if (data.type === 'task_completed' && data.data) {
+            const taskData = data.data;
+            const result = taskData.result;
+            
+            if (result && result.mass_estimation) {
+              const massEst = result.mass_estimation;
+              
+              // 첫 번째 음식 정보 사용
+              if (massEst.foods && massEst.foods.length > 0) {
+                const firstFood = massEst.foods[0];
+                if (firstFood.food_name) setValue('foodName', firstFood.food_name);
+                if (firstFood.estimated_mass_g && firstFood.estimated_mass_g > 0) {
+                  setValue('mass', Math.round(firstFood.estimated_mass_g));
+                }
+              }
+              
+              // 총 질량 사용
+              if (massEst.total_mass_g && massEst.total_mass_g > 0) {
+                setValue('mass', Math.round(massEst.total_mass_g));
+              }
+              
+              // 성공 메시지
+              if (massEst.foods && massEst.foods.length > 0) {
+                const firstFood = massEst.foods[0];
+                setAiComment(`MLServer로 분석 완료: ${firstFood.food_name || '음식'} (질량: ${Math.round(massEst.total_mass_g || 0)}g)`);
+              } else {
+                setAiComment('MLServer 분석이 완료되었습니다.');
+              }
+            } else {
+              setAiComment('MLServer 분석이 완료되었습니다.');
+            }
+            
+            ws.close();
+            resolve(result);
+            
+          } else if (data.type === 'task_failed' && data.data) {
+            const taskData = data.data;
+            setAiComment('MLServer 분석에 실패했습니다: ' + (taskData.error || '알 수 없는 오류'));
+            ws.close();
+            reject(new Error(taskData.error || 'MLServer 분석 실패'));
+          }
+        } catch (error) {
+          console.error('WebSocket 메시지 파싱 오류:', error);
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket 오류:', error);
+        setAiComment('MLServer 연결에 문제가 발생했습니다. 다시 시도해주세요.');
+        reject(error);
+      };
+      
+      ws.onclose = () => {
+        console.log('WebSocket 연결 종료');
+      };
+      
+      // 30초 타임아웃
+      setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+          setAiComment('MLServer 분석 시간이 초과되었습니다. 다시 시도해주세요.');
+          reject(new Error('타임아웃'));
+        }
+      }, 30000);
+    });
+  };
 
   // 파일 선택 핸들러
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,21 +148,48 @@ export function MealUploader() {
   // AI 이미지 분석
   const analyzeImage = async (file: File) => {
     setAnalyzing(true);
+    setAiComment(null); // 분석 시작 시 기존 메시지 초기화
     try {
-      const result = await apiClient.analyzeImage(file);
+      let result;
       
-      // 분석 결과로 폼 필드 자동 채우기
-      if (result.foodName) setValue('foodName', result.foodName);
-      if (result.calories) setValue('calories', result.calories);
-      if (result.carbs !== undefined) setValue('carbs', result.carbs);
-      if (result.protein !== undefined) setValue('protein', result.protein);
-      if (result.fat !== undefined) setValue('fat', result.fat);
-      if (result.grade) setValue('nutriScore', result.grade);
-      else if (result.nutriScore) setValue('nutriScore', result.nutriScore);
-      if (result.aiComment) setAiComment(result.aiComment);
+      if (analysisMethod === 'gemini') {
+        // Gemini API 방식 (순수 LLM만 사용)
+        result = await apiClient.analyzeImageGemini(file);
+        
+        // 분석 결과로 폼 필드 자동 채우기
+        if (result.foodName) setValue('foodName', result.foodName);
+        if (result.calories) setValue('calories', result.calories);
+        if (result.mass && result.mass > 0) setValue('mass', result.mass);
+        if (result.carbs !== undefined) setValue('carbs', result.carbs);
+        if (result.protein !== undefined) setValue('protein', result.protein);
+        if (result.fat !== undefined) setValue('fat', result.fat);
+        if (result.grade) setValue('nutriScore', result.grade);
+        else if (result.nutriScore) setValue('nutriScore', result.nutriScore);
+        if (result.aiComment) setAiComment(result.aiComment);
+        
+      } else {
+        // MLServer 방식 - 비동기 처리
+        console.log('MLServer 분석 시작...');
+        setAiComment('MLServer로 이미지를 업로드하는 중입니다...');
+        
+        const uploadResult = await apiClient.analyzeImageMLServer(file);
+        console.log('MLServer 업로드 응답:', uploadResult);
+        
+        if (uploadResult && uploadResult.data && uploadResult.data.task_id) {
+          const taskId = uploadResult.data.task_id;
+          setAiComment('MLServer에서 이미지를 분석하는 중입니다... (실시간 진행상황 확인 중)');
+          
+          // WebSocket으로 실시간 진행상황 모니터링
+          await monitorMLServerTask(taskId);
+        } else {
+          console.log('MLServer task_id를 받지 못했습니다:', uploadResult);
+          setAiComment('MLServer 업로드에 실패했습니다. 다시 시도해주세요.');
+        }
+      }
+      
     } catch (error) {
       console.error('Image analysis failed:', error);
-      setAiComment('음식 인식에 실패했습니다. 직접 입력해 주세요.');
+      setAiComment(`${analysisMethod === 'gemini' ? 'Gemini' : 'MLServer'} 음식 인식에 실패했습니다. 직접 입력해 주세요.`);
     }
     setAnalyzing(false);
   };
@@ -138,6 +256,50 @@ export function MealUploader() {
         <div className="space-y-6">
           <div className="card p-6">
             <h2 className="text-xl font-nanum mb-4">사진 업로드</h2>
+            
+            {/* 분석 방식 선택 */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">분석 방식</label>
+              <div className="flex space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="gemini"
+                    checked={analysisMethod === 'gemini'}
+                    onChange={(e) => {
+                      setAnalysisMethod(e.target.value as 'gemini' | 'mlserver');
+                      // 이미 업로드된 파일이 있으면 다시 분석
+                      if (selectedFile) {
+                        analyzeImage(selectedFile);
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">Gemini AI (빠름)</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="mlserver"
+                    checked={analysisMethod === 'mlserver'}
+                    onChange={(e) => {
+                      setAnalysisMethod(e.target.value as 'gemini' | 'mlserver');
+                      // 이미 업로드된 파일이 있으면 다시 분석
+                      if (selectedFile) {
+                        analyzeImage(selectedFile);
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  <span className="text-sm">MLServer (정밀)</span>
+                </label>
+              </div>
+              {selectedFile && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  분석 방식을 변경하면 자동으로 다시 분석됩니다.
+                </p>
+              )}
+            </div>
             
             {!previewUrl ? (
               <div
@@ -235,18 +397,29 @@ export function MealUploader() {
                 )}
               </div>
 
-              {/* 칼로리 */}
-              <div>
-                <label className="block text-sm font-medium mb-2">칼로리 (kcal)</label>
-                <input
-                  {...register('calories', { required: '칼로리를 입력해주세요', min: 0 })}
-                  type="number"
-                  className="w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="350"
-                />
-                {errors.calories && (
-                  <p className="text-sm text-destructive mt-1">{errors.calories.message}</p>
-                )}
+              {/* 칼로리와 질량 */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">칼로리 (kcal)</label>
+                  <input
+                    {...register('calories', { required: '칼로리를 입력해주세요', min: 0 })}
+                    type="number"
+                    className="w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="350"
+                  />
+                  {errors.calories && (
+                    <p className="text-sm text-destructive mt-1">{errors.calories.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">질량 (g)</label>
+                  <input
+                    {...register('mass', { min: 0 })}
+                    type="number"
+                    className="w-full p-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="200"
+                  />
+                </div>
               </div>
 
               {/* 영양소 정보 */}

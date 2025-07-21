@@ -39,9 +39,10 @@ export const apiClient = {
   },
 
   // 식사 로그 관련 API
-  analyzeImage: async (file: File) => {
+  analyzeImageGemini: async (file: File) => {
     const formData = new FormData();
     formData.append('image', file);
+    formData.append('method', 'gemini_only'); // Gemini만 사용하도록 지시
     const token = localStorage.getItem('authToken');
     const response = await api.post(
       '/api/logs/analyze-image/', // 반드시 슬래시 포함
@@ -54,6 +55,23 @@ export const apiClient = {
       }
     );
     return response.data.data;
+  },
+
+  // MLServer 방식 이미지 분석
+  analyzeImageMLServer: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = localStorage.getItem('authToken');
+    const response = await api.post(
+      '/mlserver/api/upload/',
+      formData,
+      {
+        headers: {
+          ...(token ? { 'Authorization': `Token ${token}` } : {})
+        },
+      }
+    );
+    return response.data;
   },
 
   createMealLog: async (mealData: Omit<MealLog, 'id'>): Promise<MealLog> => {
