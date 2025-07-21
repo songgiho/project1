@@ -3,8 +3,8 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  profilePicture?: string;
-  nickname: string;
+  profilePicture?: string; // 백엔드에 없을 수 있음
+  nickname?: string; // 백엔드에 없을 수 있음
 }
 
 export interface MealLog {
@@ -52,16 +52,35 @@ export interface Challenge {
   targetType: 'weight' | 'calorie' | 'macro';
   targetValue: number;
   isActive: boolean;
-  participants: any[];
+  participants: ChallengeParticipant[];
   maxParticipants?: number;
+  currentParticipantsCount?: number;
+  isFull?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  userParticipation?: ChallengeParticipant;
 }
 
 export interface ChallengeParticipant {
   id: string;
-  user: User;
+  user?: User; // user가 undefined일 수 있음
   status: 'survived' | 'eliminated';
   eliminationDate?: string;
   currentStreak: number;
+  maxStreak?: number;
+  joinedAt?: string;
+  updatedAt?: string;
+  challengeId?: string;
+}
+
+export interface ChallengeProgress {
+  id: string;
+  participant: ChallengeParticipant;
+  date: string;
+  target_achieved: boolean;
+  actual_value: number;
+  notes?: string;
+  created_at: string;
 }
 
 export interface Badge {
@@ -71,6 +90,16 @@ export interface Badge {
   iconUrl: string;
   isAcquired: boolean;
   acquiredDate?: string;
+  user?: User;
+  challenge?: Challenge;
+  createdAt?: string;
+}
+
+export interface UserBadge {
+  id: string;
+  user: string; // User ID
+  badge: Badge; // Badge 객체
+  acquiredDate: string;
 }
 
 export interface AICoachTip {
@@ -85,4 +114,4 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
-} 
+}

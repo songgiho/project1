@@ -4,87 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, Lock, Star, Calendar, Target, Zap, Award, Crown } from 'lucide-react';
 import { format } from 'date-fns';
 import { apiClient } from '@/lib/api';
-import { Badge } from '@/types';
+import { UserBadge, Badge } from '@/types'; // UserBadge 타입 임포트
 
 interface BadgeCollectionProps {
   username: string;
 }
 
 export function BadgeCollection({ username }: BadgeCollectionProps) {
-  const [badges, setBadges] = useState<Badge[]>([]);
+  const [userBadges, setUserBadges] = useState<UserBadge[]>([]); // UserBadge[]로 변경
   const [loading, setLoading] = useState(false);
-  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<UserBadge | null>(null); // UserBadge로 변경
 
   useEffect(() => {
     const loadBadges = async () => {
       setLoading(true);
       try {
         const data = await apiClient.getUserBadges(username);
-        setBadges(data);
+        setUserBadges(data);
       } catch (error) {
         console.error('Failed to load badges:', error);
-        // 임시 데이터 사용
-        setBadges([
-          {
-            id: '1',
-            name: '첫 걸음',
-            description: '첫 번째 식사 로그를 기록했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: true,
-            acquiredDate: '2025-01-10'
-          },
-          {
-            id: '2',
-            name: '7일 연속',
-            description: '7일 연속으로 식사를 기록했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: true,
-            acquiredDate: '2025-01-17'
-          },
-          {
-            id: '3',
-            name: '챌린지 마스터',
-            description: '첫 번째 챌린지를 완주했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: true,
-            acquiredDate: '2025-01-21'
-          },
-          {
-            id: '4',
-            name: '칼로리 킹',
-            description: '칼로리 챌린지에서 1위를 달성했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: false
-          },
-          {
-            id: '5',
-            name: '30일 마라톤',
-            description: '30일 연속으로 식사를 기록했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: false
-          },
-          {
-            id: '6',
-            name: '영양 마스터',
-            description: '모든 영양소 챌린지를 완주했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: false
-          },
-          {
-            id: '7',
-            name: '소셜 스타',
-            description: '10명 이상의 챌린지에 참여했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: false
-          },
-          {
-            id: '8',
-            name: '완벽주의자',
-            description: '100% 정확도로 7일 연속 기록했습니다',
-            iconUrl: '/api/placeholder/80/80',
-            isAcquired: false
-          }
-        ]);
+        setUserBadges([]);
       }
       setLoading(false);
     };
@@ -106,36 +45,38 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
     }
   };
 
-  const acquiredBadges = badges.filter(badge => badge.isAcquired);
-  const unacquiredBadges = badges.filter(badge => !badge.isAcquired);
+  // 기존: userBadges.filter(userBadge => userBadge.isAcquired)
+  // Badge 타입이 camelCase로 통일되었으므로, 아래와 같이 사용
+  const acquiredBadges = userBadges.filter(userBadge => userBadge.isAcquired);
+  const unacquiredBadges = userBadges.filter(userBadge => !userBadge.isAcquired);
 
-  const BadgeCard = ({ badge }: { badge: Badge }) => {
-    const Icon = getBadgeIcon(badge.name);
+  const BadgeCard = ({ userBadge }: { userBadge: UserBadge }) => {
+    const Icon = getBadgeIcon(userBadge.badge.name); // userBadge.badge.name 사용
     
     return (
       <div
         className={`card p-6 text-center cursor-pointer transition-all hover:scale-105 ${
-          badge.isAcquired 
+          userBadge.isAcquired 
             ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200' 
             : 'bg-muted/30 opacity-60'
         }`}
-        onClick={() => setSelectedBadge(badge)}
+        onClick={() => setSelectedBadge(userBadge)}
       >
         <div className="relative">
           {/* 배지 이미지/아이콘 */}
           <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${
-            badge.isAcquired 
+            userBadge.isAcquired 
               ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white' 
               : 'bg-gray-300 text-gray-500'
           }`}>
-            {badge.iconUrl && badge.isAcquired ? (
+            {userBadge.badge.iconUrl && userBadge.isAcquired ? ( // userBadge.badge.iconUrl 사용
               <img
-                src={badge.iconUrl}
-                alt={badge.name}
+                src={userBadge.badge.iconUrl}
+                alt={userBadge.badge.name}
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              badge.isAcquired ? (
+              userBadge.isAcquired ? (
                 <Icon className="w-10 h-10" />
               ) : (
                 <Lock className="w-10 h-10" />
@@ -144,7 +85,7 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
           </div>
 
           {/* 획득 표시 */}
-          {badge.isAcquired && (
+          {userBadge.isAcquired && (
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
               <Star className="w-3 h-3 text-white fill-current" />
             </div>
@@ -152,20 +93,20 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
         </div>
 
         <h3 className={`font-nanum mb-2 font-nanum ${
-          badge.isAcquired ? 'text-foreground' : 'text-muted-foreground'
+          userBadge.isAcquired ? 'text-foreground' : 'text-muted-foreground'
         }`}>
-          {badge.name}
+          {userBadge.badge.name} {/* userBadge.badge.name 사용 */}
         </h3>
         
         <p className={`text-sm ${
-          badge.isAcquired ? 'text-muted-foreground' : 'text-muted-foreground/60'
+          userBadge.isAcquired ? 'text-muted-foreground' : 'text-muted-foreground/60'
         }`}>
-          {badge.description}
+          {userBadge.badge.description} {/* userBadge.badge.description 사용 */}
         </p>
 
-        {badge.isAcquired && badge.acquiredDate && (
+        {userBadge.isAcquired && userBadge.acquiredDate && (
           <div className="mt-3 text-xs text-primary">
-            {format(new Date(badge.acquiredDate), 'yyyy년 M월 d일')} 획득
+            {format(new Date(userBadge.acquiredDate), 'yyyy년 M월 d일')} 획득
           </div>
         )}
       </div>
@@ -192,7 +133,7 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
         
         <div className="card p-6 text-center">
           <div className="text-3xl font-nanum text-orange-500 mb-2 font-nanum">
-            {Math.round((acquiredBadges.length / badges.length) * 100) || 0}%
+            {Math.round((acquiredBadges.length / userBadges.length) * 100) || 0}% {/* userBadges.length 사용 */}
           </div>
           <div className="text-sm text-muted-foreground font-nanum">수집률</div>
         </div>
@@ -220,8 +161,8 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
                 획득한 배지 ({acquiredBadges.length})
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {acquiredBadges.map((badge) => (
-                  <BadgeCard key={badge.id} badge={badge} />
+                {acquiredBadges.map((userBadge) => (
+                  <BadgeCard key={userBadge.id} userBadge={userBadge} /> // userBadge 전달
                 ))}
               </div>
             </div>
@@ -234,8 +175,8 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
                 미획득 배지 ({unacquiredBadges.length})
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {unacquiredBadges.map((badge) => (
-                  <BadgeCard key={badge.id} badge={badge} />
+                {unacquiredBadges.map((userBadge) => (
+                  <BadgeCard key={userBadge.id} userBadge={userBadge} /> // userBadge 전달
                 ))}
               </div>
             </div>
@@ -254,21 +195,21 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
                   ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white' 
                   : 'bg-gray-300 text-gray-500'
               }`}>
-                {selectedBadge.iconUrl && selectedBadge.isAcquired ? (
+                {selectedBadge.badge.iconUrl && selectedBadge.isAcquired ? (
                   <img
-                    src={selectedBadge.iconUrl}
-                    alt={selectedBadge.name}
+                    src={selectedBadge.badge.iconUrl}
+                    alt={selectedBadge.badge.name}
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
-                  React.createElement(getBadgeIcon(selectedBadge.name), { 
+                  React.createElement(getBadgeIcon(selectedBadge.badge.name), { 
                     className: "w-12 h-12" 
                   })
                 )}
               </div>
 
-              <h3 className="text-xl font-nanum mb-2">{selectedBadge.name}</h3>
-              <p className="text-muted-foreground mb-4">{selectedBadge.description}</p>
+              <h3 className="text-xl font-nanum mb-2">{selectedBadge.badge.name}</h3>
+              <p className="text-muted-foreground mb-4">{selectedBadge.badge.description}</p>
 
               {selectedBadge.isAcquired ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
@@ -306,4 +247,4 @@ export function BadgeCollection({ username }: BadgeCollectionProps) {
       )}
     </div>
   );
-} 
+}
