@@ -43,11 +43,23 @@ export function MealUploader() {
   // MLServer 작업 모니터링 함수
   const monitorMLServerTask = async (taskId: string) => {
     return new Promise((resolve, reject) => {
+      console.log('WebSocket 연결 시도:', `ws://localhost:8000/ws/task/${taskId}/`);
       const ws = new WebSocket(`ws://localhost:8000/ws/task/${taskId}/`);
       
+      let connectionTimeout = setTimeout(() => {
+        console.log('WebSocket 연결 타임아웃');
+        ws.close();
+        setAiComment('MLServer 연결 시간이 초과되었습니다. 다시 시도해주세요.');
+        reject(new Error('연결 타임아웃'));
+      }, 5000); // 5초 연결 타임아웃
+      
       ws.onopen = () => {
+        clearTimeout(connectionTimeout);
         console.log('WebSocket 연결됨:', taskId);
         setAiComment('MLServer에서 이미지를 분석하는 중입니다... (연결됨)');
+        
+        // 연결 후 상태 요청
+        ws.send(JSON.stringify({ type: 'get_status' }));
       };
       
       ws.onmessage = (event) => {
@@ -56,38 +68,78 @@ export function MealUploader() {
           console.log('WebSocket 메시지:', data);
           
           // Django 백엔드 메시지 형식에 맞게 처리
-          if (data.type === 'task_update' && data.data) {
+          if (data.type === 'task.update' && data.data) {
             const taskData = data.data;
             const progress = Math.round((taskData.progress || 0) * 100);
             setAiComment(`MLServer 분석 중... ${progress}% 완료 - ${taskData.message || ''}`);
             
-          } else if (data.type === 'task_completed' && data.data) {
+          } else if (data.type === 'task.completed' && data.data) {
             const taskData = data.data;
             const result = taskData.result;
             
-            if (result && result.mass_estimation) {
-              const massEst = result.mass_estimation;
-              
-              // 첫 번째 음식 정보 사용
-              if (massEst.foods && massEst.foods.length > 0) {
-                const firstFood = massEst.foods[0];
-                if (firstFood.food_name) setValue('foodName', firstFood.food_name);
-                if (firstFood.estimated_mass_g && firstFood.estimated_mass_g > 0) {
-                  setValue('mass', Math.round(firstFood.estimated_mass_g));
+            console.log('작업 완료 결과:', result);
+            
+            // MLServer 결과 형식에 맞게 처리
+            if (result) {
+              // MLServer 결과에서 mass_estimation 확인
+              if (result.mass_estimation) {
+                const massEst = result.mass_estimation;
+                
+                // 첫 번째 음식 정보 사용
+                if (massEst.foods && massEst.foods.length > 0) {
+                  const firstFood = massEst.foods[0];
+                  if (firstFood.food_name) setValue('foodName', firstFood.food_name);
+                  if (firstFood.estimated_mass_g && firstFood.estimated_mass_g > 0) {
+                    setValue('mass', Math.round(firstFood.estimated_mass_g));
+                  }
                 }
-              }
-              
-              // 총 질량 사용
-              if (massEst.total_mass_g && massEst.total_mass_g > 0) {
-                setValue('mass', Math.round(massEst.total_mass_g));
-              }
-              
-              // 성공 메시지
-              if (massEst.foods && massEst.foods.length > 0) {
-                const firstFood = massEst.foods[0];
-                setAiComment(`MLServer로 분석 완료: ${firstFood.food_name || '음식'} (질량: ${Math.round(massEst.total_mass_g || 0)}g)`);
+                
+                // 총 질량 사용
+                if (massEst.total_mass_g && massEst.total_mass_g > 0) {
+                  setValue('mass', Math.round(massEst.total_mass_g));
+                  
+                  // 질량을 기반으로 칼로리 추정 (기본값: 2kcal/g)
+                  const estimatedCalories = Math.round(massEst.total_mass_g * 2);
+                  setValue('calories', estimatedCalories);
+                  
+                  // 기본 영양소 비율로 추정 (임시값)
+                  setValue('carbs', Math.round(estimatedCalories * 0.5 / 4)); // 탄수화물 50%
+                  setValue('protein', Math.round(estimatedCalories * 0.2 / 4)); // 단백질 20%
+                  setValue('fat', Math.round(estimatedCalories * 0.3 / 9)); // 지방 30%
+                  setValue('nutriScore', 'C'); // 기본 등급
+                }
+                
+                // 성공 메시지
+                if (massEst.foods && massEst.foods.length > 0) {
+                  const firstFood = massEst.foods[0];
+                  const foodName = firstFood.food_name || '음식';
+                  const totalMass = Math.round(massEst.total_mass_g || 0);
+                  const estimatedCalories = Math.round(totalMass * 2);
+                  if (totalMass > 0) {
+                    setAiComment(`MLServer로 분석 완료: ${foodName} (질량: ${totalMass}g, 추정 칼로리: ${estimatedCalories}kcal)`);
+                  } else {
+                    setAiComment(`MLServer로 분석 완료: ${foodName}`);
+                  }
+                } else {
+                  setAiComment('MLServer 분석이 완료되었습니다.');
+                }
               } else {
-                setAiComment('MLServer 분석이 완료되었습니다.');
+                // 기본 결과 형식 처리 (백업)
+                if (result.foodName) setValue('foodName', result.foodName);
+                if (result.calories && result.calories > 0) setValue('calories', result.calories);
+                if (result.mass && result.mass > 0) setValue('mass', result.mass);
+                if (result.carbs !== undefined) setValue('carbs', result.carbs);
+                if (result.protein !== undefined) setValue('protein', result.protein);
+                if (result.fat !== undefined) setValue('fat', result.fat);
+                if (result.grade) setValue('nutriScore', result.grade);
+                
+                const foodName = result.foodName || '음식';
+                const mass = result.mass || 0;
+                if (mass > 0) {
+                  setAiComment(`MLServer로 분석 완료: ${foodName} (질량: ${mass}g)`);
+                } else {
+                  setAiComment(`MLServer로 분석 완료: ${foodName}`);
+                }
               }
             } else {
               setAiComment('MLServer 분석이 완료되었습니다.');
@@ -96,7 +148,7 @@ export function MealUploader() {
             ws.close();
             resolve(result);
             
-          } else if (data.type === 'task_failed' && data.data) {
+          } else if (data.type === 'task.failed' && data.data) {
             const taskData = data.data;
             setAiComment('MLServer 분석에 실패했습니다: ' + (taskData.error || '알 수 없는 오류'));
             ws.close();
@@ -108,21 +160,26 @@ export function MealUploader() {
       };
       
       ws.onerror = (error) => {
+        clearTimeout(connectionTimeout);
         console.error('WebSocket 오류:', error);
-        setAiComment('MLServer 연결에 문제가 발생했습니다. 다시 시도해주세요.');
+        setAiComment('MLServer 연결에 문제가 발생했습니다. 서버 상태를 확인해주세요.');
         reject(error);
       };
       
-      ws.onclose = () => {
-        console.log('WebSocket 연결 종료');
+      ws.onclose = (event) => {
+        clearTimeout(connectionTimeout);
+        console.log('WebSocket 연결 종료:', event.code, event.reason);
+        if (event.code !== 1000) { // 정상 종료가 아닌 경우
+          console.log('비정상 WebSocket 종료');
+        }
       };
       
-      // 30초 타임아웃
+      // 30초 작업 타임아웃
       setTimeout(() => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.close();
           setAiComment('MLServer 분석 시간이 초과되었습니다. 다시 시도해주세요.');
-          reject(new Error('타임아웃'));
+          reject(new Error('작업 타임아웃'));
         }
       }, 30000);
     });
